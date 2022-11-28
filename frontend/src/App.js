@@ -1,7 +1,10 @@
 import logo from './logo.svg';
+import React from 'react'
 import './App.css';
+import {connect} from './Services/SocketHandler'
 
 function App() {
+  connect("Player 1")
   return (
     <div className="App">
       <header className="App-header">
