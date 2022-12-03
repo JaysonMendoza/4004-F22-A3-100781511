@@ -32,7 +32,7 @@ function onWsConnected(frame) {
     client.subscribe("/topic/messageReceived",handleMessageReceived);
     client.subscribe("/topic/updateScoreBoard",handleUpdateScoreBoard);
     client.subscribe("/topic/updateGameBoard",handleUpdateGameBoard);
-    
+    client.subscribe("/user/queue/OtherPlayerUpdated",handleOtherPlayerUpdated);   
 }
 
 
@@ -61,18 +61,44 @@ function handlePlayerUpdated(response) {
 
 function handleStartGame(response) {
     console.log("Starting game!");
+    useGameStateStore.setIsGameStarted(true);
 }
 
 function handleUpdateScoreBoard(response) {
     console.log("Score Board Update Recieved!");
+    let data = JSON.parse(response.body);
+    if ( !(data.hasOwnProperty("playerID") && data.hasOwnProperty("playerName") && data.hasOwnProperty("score")) || isNaN(data.score) ) {
+        console.error("handleMessageReceived recieved malformed data.")
+        return;
+    }
+    let playerID = data.playerID;
+    let scoreData = data;
+    useScoreBoardStore.getState().update(playerID,scoreData);
 }
 
 function handleUpdateGameBoard(response) {
     console.log("Game Board Update Recieved!");
+    let data = JSON.parse(response.body);
+    if ( !(data.hasOwnProperty("numCardsDrawPile") && data.hasOwnProperty("discardPile")) || isNaN(data.numCardsDrawPile)) {
+        console.error("handleMessageReceived recieved malformed data.")
+        return;
+    }
+    useGameBoardStore.getState().updateNumDrawPile(data.numCardsDrawPile)
+    useGameBoardStore.getState().updateDiscardPile(data.discardPile);
+}
+
+function handleOtherPlayerUpdated(response) {
+    console.log("Other Player Update Recieved!");
+    let data = JSON.parse(response.body);
+    if ( !(data.hasOwnProperty("playerID") && data.hasOwnProperty("numCards")) || isNaN(data.numCards)) {
+        console.error("handleMessageReceived recieved malformed data.")
+        return;
+    }
+    useGameBoardStore.getState().updateOthPlayerHand(data.playerID,data.numCards);
 }
 
 function handleMessageReceived(response) {
-    let data = response.body;
+    let data = JSON.parse(response.body);
     if ( !(data.hasOwnProperty("senderName") && data.hasOwnProperty("message")) ) {
         console.error("handleMessageReceived recieved malformed data.")
         return;
