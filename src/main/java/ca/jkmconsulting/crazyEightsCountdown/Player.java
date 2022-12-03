@@ -7,10 +7,10 @@ import java.util.UUID;
 public class Player {
     private final Logger LOG = LoggerFactory.getLogger(Player.class);
     private final String sessionID;
-    private final UUID playerID;
+    private final String playerID;
     private String name;
 
-    public Player(String name,String sessionID,UUID playerID) {
+    public Player(String name,String sessionID,String playerID) {
         this.sessionID = sessionID;
         this.playerID = playerID;
         this.name = name;
@@ -21,7 +21,7 @@ public class Player {
         return sessionID;
     }
 
-    public UUID getPlayerID() {
+    public String getPlayerID() {
         return playerID;
     }
 

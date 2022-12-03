@@ -2,6 +2,7 @@ import logo from './logo.svg';
 import React from 'react'
 import './App.css';
 import {connect} from './Services/SocketHandler'
+import RegistrationForm from './Components/Registration';
 
 function App() {
   connect("Player 1")
@@ -21,6 +22,7 @@ function App() {
           Learn React
         </a>
       </header>
+      <RegistrationForm/>
     </div>
   );
 }

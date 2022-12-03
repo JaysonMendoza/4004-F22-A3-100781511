@@ -1,53 +1,67 @@
 package ca.jkmconsulting.crazyEightsCountdown;
 
-import org.checkerframework.checker.units.qual.C;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.annotation.SendToUser;
+import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.request.RequestContextHolder;
 
+import java.security.Principal;
+import java.util.HashSet;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Service
+@Controller
 public class PlayerManager {
-
+    static private final HashSet<UUID> assignedUUIDs= new HashSet<>();
     private final Logger LOG = LoggerFactory.getLogger(PlayerManager.class);
-    ConcurrentHashMap<UUID,Player> playerIDs;
-    ConcurrentHashMap<String,Player> playerSessions;
+    private ConcurrentHashMap<String,Player> playerIDsToPlayer;
 
     public PlayerManager() {
-        this.playerIDs = new ConcurrentHashMap<>();
-        this.playerSessions = new ConcurrentHashMap<>();
+        this.playerIDsToPlayer = new ConcurrentHashMap<>();
     }
 
-    //    @RequestMapping(value = "/joinGame", method = RequestMethod.POST)
+    @Autowired
+    SimpMessagingTemplate message;
+
     @MessageMapping("/joinGame")
-    synchronized public Player registerPlayer(@RequestParam("name") String name) {
-        LOG.info(String.format("Registration request for player %s received.",name));
-        String sessionID = RequestContextHolder.currentRequestAttributes().getSessionId();
+    @SendToUser("/queue/playerUpdated")
+    synchronized public PlayerUpdate registerPlayer(Principal principal,@RequestParam() String name,@Header("simpSessionId") String sessionId) {
+        LOG.info(String.format("Registration request for player %s received. Session: %s, PlayerID: %s",name,sessionId,principal.getName()));
 
-        if(sessionID=="") {
-            LOG.warn("User '{}' had an invalid session id",name);
-            return null;
-        }
-        UUID playerID = UUID.randomUUID();
-        while(playerIDs.containsKey(playerID)) {
-            playerID = UUID.randomUUID();
-        }
-
-        Player player = new Player(name,sessionID,playerID);
-
+        Player player = this.playerIDsToPlayer.computeIfAbsent(principal.getName(),k -> new Player(name,sessionId,principal.getName()));
+        //todo: register observer on player for updates
         //todo: register to game
 
-        playerSessions.put(sessionID,player);
-        playerIDs.put(playerID,player);
         LOG.info("Player '{}' registered successfully!",name);
-        return player;
+        return new PlayerUpdate(player.getPlayerID(),player.getName(),null);
+    }
+
+
+    synchronized void handlePlayerUpdated(Player player) {
+        if(player==null) {
+            this.LOG.error("handlePlayerUpdated() Invocation Error: Player cannot be null");
+            return;
+        }
+
+        this.LOG.info("Message: updatePlayer from player '{}' received.", player.getName());
+
+        message.convertAndSendToUser(player.getSessionID(),"/queue/playerUpdated",new PlayerUpdate(player.getPlayerID(),player.getName(),null)); //TODO: When cards implemented change this line to use it
+    }
+
+    static UUID getNewPlayerID() {
+        UUID playerID = UUID.randomUUID();
+        while(assignedUUIDs.contains(playerID)) {
+            playerID = UUID.randomUUID();
+        }
+        return playerID;
     }
 
 }

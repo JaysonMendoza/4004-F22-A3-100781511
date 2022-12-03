@@ -1,5 +1,8 @@
 package ca.jkmconsulting.crazyEightsCountdown;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.spi.LoggerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -21,6 +24,7 @@ public class CrazyEightsCountdownDedicatedServer {
     @Bean(name="asyncExecutor")
     public Executor asyncExecutor()
     {
+
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(20);
         executor.setMaxPoolSize(100);
