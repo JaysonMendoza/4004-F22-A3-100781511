@@ -16,7 +16,10 @@ const client = new Client(
         onUnhandledMessage: (out) => console.log("Unhandled: "+out)
     }
 );
+
+console.log("Constructed SocketHandler.js");
 export const connect = async (name) => {
+    console.log("Connecting to "+SOCK_SVR)
     client.activate();
 }
 
@@ -28,6 +31,7 @@ function onWsConnected(frame) {
     
     client.subscribe("/topic/startGame",handleStartGame);
     client.subscribe("/user/queue/playerUpdated",handlePlayerUpdated);
+    client.subscribe("/user/queue/playerRegistered",handlePlayerRegistered);
     client.subscribe("/user/queue/messageReceived",handleMessageReceived);
     client.subscribe("/topic/messageReceived",handleMessageReceived);
     client.subscribe("/topic/updateScoreBoard",handleUpdateScoreBoard);
@@ -40,8 +44,19 @@ function onWsConnected(frame) {
  * TOPIC HANDLERS
  */
 
+function handlePlayerRegistered(response) {
+    console.log("handlePlayerRegistered():",response.body)
+    let data = JSON.parse(response.body);
+    if ( !(data.hasOwnProperty("playerID") && data.hasOwnProperty("cards")) ) {
+        console.error("handlePlayerRegistered recieved malformed data.")
+        return;
+    }
+    useGameStateStore.getState().setIsRegistered(true);
+    handlePlayerUpdated(response);
+}
+
 function handlePlayerUpdated(response) {
-    console.log(response.body)
+    console.log("handlePlayerUpdated:",response.body)
     let data = JSON.parse(response.body);
     if ( !(data.hasOwnProperty("playerID") && data.hasOwnProperty("cards")) ) {
         console.error("handleUpdatePlayer recieved malformed data.")

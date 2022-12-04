@@ -32,7 +32,7 @@ public class PlayerManager {
     SimpMessagingTemplate message;
 
     @MessageMapping("/joinGame")
-    @SendToUser("/queue/playerUpdated")
+    @SendToUser("/queue/playerRegistered")
     synchronized public PlayerUpdate registerPlayer(Principal principal,@RequestParam() String name,@Header("simpSessionId") String sessionId) {
         LOG.info(String.format("Registration request for player %s received. Session: %s, PlayerID: %s",name,sessionId,principal.getName()));
 
