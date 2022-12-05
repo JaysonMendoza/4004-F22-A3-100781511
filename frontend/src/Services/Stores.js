@@ -28,7 +28,11 @@ const exampleTurnOrder = [
 ]
 export const useTurnOrder = create( (set) => ({
     scores : [...exampleTurnOrder],
-    update : (turnOrder) => set( {scores : turnOrder} )
+    isPlayReversed : false,
+    round : 0,
+    updateTurnInfo : (turnInfo) => set( {scores : turnInfo} ),
+    setIsPlayReversed : (newIsPlayReversed) => set( {isPlayReversed : newIsPlayReversed} ),
+    setRound : (newRoundNum) => set( {round : newRoundNum} )
 }))
 
 

@@ -31,7 +31,7 @@ public class PlayerManager implements PlayerHandObserver {
         LOG.info(String.format("Registration request for player %s received. Session: %s, PlayerID: %s",name,sessionId,principal.getName()));
 
         Player player = this.playerPrincipalToPlayer.computeIfAbsent(principal.getName(), k -> new Player(name,sessionId,principal.getName()));
-        //todo: register observer on player for updates
+        player.subscribeHandUpdates(this);
         //todo: register to game
 
         LOG.info("Player '{}' registered successfully!",name);

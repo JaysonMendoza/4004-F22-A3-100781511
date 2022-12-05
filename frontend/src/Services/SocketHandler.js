@@ -82,11 +82,13 @@ function handleStartGame(response) {
 function handleUpdateTurnOrder(response) {
     console.log("Turn Order Update Recieved!");
     let data = JSON.parse(response.body);
-    if ( !data.hasOwnProperty("turnSequence") ) {
+    if ( !(data.hasOwnProperty("turnSequence") && data.hasOwnProperty("isPlayReversed") && data.hasOwnProperty("round") ) ) {
         console.error("handleMessageReceived recieved malformed data.")
         return;
     }
-    useTurnOrder.getState().update(data);
+    useTurnOrder.getState().updateTurnInfo(data.turnSequence);
+    useTurnOrder.getState().setIsPlayReversed(data.isPlayReversed);
+    useTurnOrder.getState().setRound(data.round);
 }
 
 function handleUpdateGameBoard(response) {
