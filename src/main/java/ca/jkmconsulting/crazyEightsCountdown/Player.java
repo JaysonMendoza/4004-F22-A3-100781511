@@ -15,6 +15,7 @@ public class Player {
     private final ArrayList<Card> hand;
     private final HashMap<Suit,ArrayList<Card>> cardsOfSuit;
     private final ArrayList<Card> wildCards;
+    private final HashSet<PlayerHandObserver> observers;
 
     public Player(String name,String sessionID,String playerID) {
         this.sessionID = sessionID;
@@ -23,8 +24,9 @@ public class Player {
         hand = new ArrayList<>();
         wildCards = new ArrayList<>(4);
         cardsOfSuit = new HashMap<>();
+        observers = new HashSet<>();
         for(Suit s : Suit.values()) {
-            cardsOfSuit.put(s,new ArrayList<>());
+            cardsOfSuit.put(s,new ArrayList<Card>());
         }
         LOG.info("Created Player '{}' with ID '{}' and session '{}'",name,playerID,sessionID);
     }
@@ -108,14 +110,17 @@ public class Player {
     }
 
     public boolean subscribeHandUpdates(PlayerHandObserver subscriber) {
-        return false;
+        return observers.add(subscriber);
     }
 
     public boolean unsubscribeHandUpdates(PlayerHandObserver subscriber) {
-        return false;
+        return observers.remove(subscriber);
     }
 
     private void notifyHandUpdated() {
-
+        HashSet<PlayerHandObserver> obs = new HashSet<>(observers);
+        for(PlayerHandObserver ob : obs) {
+            ob.handlePlayerHandUpdate(new ArrayList<>(hand));
+        }
     }
 }
