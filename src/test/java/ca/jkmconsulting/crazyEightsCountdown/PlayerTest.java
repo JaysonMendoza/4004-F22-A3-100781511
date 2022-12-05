@@ -72,7 +72,7 @@ class PlayerTest {
 
         assertNotNull(p.getPlayableCards(Suit.HEARTS),"should not return null on empty set");
 
-        assertEquals(0,p.getPlayableCards(Suit.SPADES),"Should return size zero with no cards");
+        assertEquals(0,p.getPlayableCards(Suit.SPADES).size(),"Should return size zero with no cards");
 
         for(Card c : hand) {
             assertTrue(p.addCard(c));
@@ -82,13 +82,13 @@ class PlayerTest {
         assertEquals(4,p.getPlayableCards(Suit.HEARTS).size(),"Hearts returned an incorrect size of playable cards");
 
         //Diamonds should have only 2 playable cards because of wildcards only
-        assertEquals(2,p.getPlayableCards(Suit.DIAMONDS),"Diamonds returned an incorrect size of playable cards");
+        assertEquals(2,p.getPlayableCards(Suit.DIAMONDS).size(),"Diamonds returned an incorrect size of playable cards");
 
         //Clubs should have 3 regular plus 2 wild = 5
-        assertEquals(5,p.getPlayableCards(Suit.CLUBS),"Clubs returned an incorrect size of playable cards");
+        assertEquals(5,p.getPlayableCards(Suit.CLUBS).size(),"Clubs returned an incorrect size of playable cards");
 
         //Spades should have three playable cards plus two wildcards (including the spade 8) = 5
-        assertEquals(5,p.getPlayableCards(Suit.SPADES),"Spades returned an incorrect size of playable cards");
+        assertEquals(5,p.getPlayableCards(Suit.SPADES).size(),"Spades returned an incorrect size of playable cards");
 
     }
 
