@@ -50,20 +50,21 @@ class DeckTest {
         test2.add(Card.HEARTS_KING);
         test2.add(Card.HEARTS_ACE);
         int lastIndex = test2.size()-1;
+        deck = new Deck(test2);
         allCards.forEach(c ->{
            if(!test2.contains(c)) {
                test2.add(c);
            }
         });
         assertEquals(allCards.size(),test2.size());
-        deck = new Deck(test2);
-        for(int i=0;i<allCards.size();++i) {
+
+        for(int i=0;i<test2.size();++i) {
             Card c = deck.drawCard();
             if(i<=lastIndex) {
                 assertEquals(test2.get(i),c);
             }
-            assertTrue(test2.remove(c));
+            assertTrue(allCards.remove(c));
         }
-        assertEquals(0,test1.size());
+        assertEquals(0,allCards.size());
     }
 }
