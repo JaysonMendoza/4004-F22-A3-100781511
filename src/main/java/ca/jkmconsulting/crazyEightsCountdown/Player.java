@@ -26,7 +26,7 @@ public class Player {
         cardsOfSuit = new HashMap<>();
         observers = new HashSet<>();
         for(Suit s : Suit.values()) {
-            cardsOfSuit.put(s,new ArrayList<Card>());
+            cardsOfSuit.put(s,new ArrayList<>());
         }
         LOG.info("Created Player '{}' with ID '{}' and session '{}'",name,playerID,sessionID);
     }
@@ -42,6 +42,7 @@ public class Player {
     public String getName() {
         return name;
     }
+
     /**
      * Adds a card to a players hand and updates all observers.
      * Cards must not already exist in a players hand.
@@ -118,9 +119,20 @@ public class Player {
     }
 
     private void notifyHandUpdated() {
+        PlayerUpdate pu = new PlayerUpdate(
+                playerID,
+                name,
+                hand
+        );
+        OtherPlayerHandUpdate opu = new OtherPlayerHandUpdate(
+          playerID,
+          name,
+          hand.size()
+        );
         HashSet<PlayerHandObserver> obs = new HashSet<>(observers);
+
         for(PlayerHandObserver ob : obs) {
-            ob.handlePlayerHandUpdate(new ArrayList<>(hand));
+            ob.handlePlayerHandUpdate(this,pu,opu);
         }
     }
 }

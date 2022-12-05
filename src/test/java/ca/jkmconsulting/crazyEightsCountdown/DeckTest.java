@@ -44,6 +44,8 @@ class DeckTest {
         test2.add(Card.HEARTS_6);
         test2.add(Card.HEARTS_7);
         test2.add(Card.HEARTS_8);
+        assertTrue(Card.HEARTS_8.isWildCard());
+        assertFalse(Card.CLUBS_4.isWildCard());
         test2.add(Card.HEARTS_9);
         test2.add(Card.HEARTS_10);
         test2.add(Card.HEARTS_JACK);
