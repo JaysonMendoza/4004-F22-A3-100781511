@@ -48,6 +48,25 @@ public class Player {
      * @return True if the card was successfully added, False if duplicate or card was null
      */
     public boolean addCard(Card card) {
-        return false;
+        if(card==null) {
+            this.LOG.error("Player::addCard: PlayerID '{}', Player '{}' cannot add a null card to hand",playerID,name);
+            return false;
+        }
+        else if(hand.contains(card)) {
+            this.LOG.error("Player::addCard: PlayerID '{}', Player '{}' cannot add '{}' to hand because it is already inside the hand",playerID,name,card);
+            return false;
+        }
+
+        hand.add(card);
+        cardsOfSuit.get(card.suit).add(card);
+        if(card.isWildCard()) {
+            wildCards.add(card);
+        }
+        notifyHandUpdated();
+        return true;
+    }
+
+    private void notifyHandUpdated() {
+
     }
 }
