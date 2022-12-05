@@ -1,6 +1,6 @@
 import { Client } from "@stomp/stompjs"
 import SockJS from "sockjs-client"
-import { useGameBoardStore,usePlayerStore,useScoreBoardStore,useMessageStore, useGameStateStore } from "./Stores"
+import { useGameBoardStore,usePlayerStore,useTurnOrder,useMessageStore, useGameStateStore } from "./Stores"
 const SOCK_SVR = "http://localhost:8080/ws"
 
 const client = new Client(
@@ -34,7 +34,7 @@ function onWsConnected(frame) {
     client.subscribe("/user/queue/playerRegistered",handlePlayerRegistered);
     client.subscribe("/user/queue/messageReceived",handleMessageReceived);
     client.subscribe("/topic/messageReceived",handleMessageReceived);
-    client.subscribe("/topic/updateScoreBoard",handleUpdateScoreBoard);
+    client.subscribe("/topic/updateTurnOrder",handleUpdateTurnOrder);
     client.subscribe("/topic/updateGameBoard",handleUpdateGameBoard);
     client.subscribe("/user/queue/OtherPlayerUpdated",handleOtherPlayerUpdated);   
 }
@@ -79,16 +79,14 @@ function handleStartGame(response) {
     useGameStateStore.setIsGameStarted(true);
 }
 
-function handleUpdateScoreBoard(response) {
-    console.log("Score Board Update Recieved!");
+function handleUpdateTurnOrder(response) {
+    console.log("Turn Order Update Recieved!");
     let data = JSON.parse(response.body);
-    if ( !(data.hasOwnProperty("playerID") && data.hasOwnProperty("playerName") && data.hasOwnProperty("score")) || isNaN(data.score) ) {
+    if ( !data.hasOwnProperty("turnSequence") ) {
         console.error("handleMessageReceived recieved malformed data.")
         return;
     }
-    let playerID = data.playerID;
-    let scoreData = data;
-    useScoreBoardStore.getState().update(playerID,scoreData);
+    useTurnOrder.getState().update(data);
 }
 
 function handleUpdateGameBoard(response) {
@@ -131,6 +129,14 @@ export function actionRegisterPlayer(name) {
         destination: "/app/joinGame",
         body : name
     });
+}
+
+export function actionPlayCard(cardEnum) {
+    console.log("actionPlayCard:",cardEnum);
+}
+
+export function actionDrawCard() {
+    console.log("actionDrawCard");
 }
 
 
