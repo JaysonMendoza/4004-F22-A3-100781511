@@ -1,19 +1,16 @@
 package ca.jkmconsulting.crazyEightsCountdown;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Stack;
+import java.util.*;
 
 public class Deck {
     final private Stack<Card> drawDeck;
     final private ArrayList<Card> cardsIssued;
-    final private ArrayList<Card> discardPile;
+    final private Stack<Card> discardPile;
 
     public Deck(ArrayList<Card> fixedOrder) {
         drawDeck = new Stack<>();
         cardsIssued = new ArrayList<>();
-        discardPile = new ArrayList<>();
+        discardPile = new Stack<>();
         buildDeck(fixedOrder);
     }
 
@@ -21,9 +18,18 @@ public class Deck {
         this(null);
     }
 
+    public List<Card> getDiscardPile() {
+        return discardPile.stream().toList();
+    }
+
+    public Card getTopDiscardedCard() {
+        return discardPile.peek();
+    }
+
     private void buildDeck(ArrayList<Card> cardOrder) {
         drawDeck.clear();
         discardPile.clear();
+        cardsIssued.clear();
         ArrayList<Card> allCards = new ArrayList<>(Arrays.asList(Card.values()));
         Collections.shuffle(allCards);
 //        ArrayList<Card> order = cardOrder;
@@ -39,28 +45,29 @@ public class Deck {
                 drawDeck.push(cardOrder.get(i));
             }
         }
-        else if(!cardsIssued.isEmpty()) { //If a reshuffle, then rebuild deck with the exclusion of issued cards
-            for(Card c : allCards) {
-                if(!cardsIssued.contains(c)) {
-                    drawDeck.push(c);
-                }
-            }
-        }
         else {
             drawDeck.addAll(allCards);
         }
     }
 
     public int getNumCardsInDeck() {
-        return -1;
+        return drawDeck.size();
     }
 
     public Card drawCard() {
         if(drawDeck.isEmpty()) {
-            buildDeck(null);
+            return null;
         }
         Card c = drawDeck.pop();
         cardsIssued.add(c);
         return c;
+    }
+
+    public boolean discardCard(Card card) {
+        boolean rc = cardsIssued.remove(card);
+        if(rc) {
+            discardPile.push(card);
+        }
+        return rc;
     }
 }

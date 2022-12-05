@@ -65,6 +65,7 @@ class DeckTest {
             }
             assertTrue(allCards.remove(c));
         }
+        assertNull(deck.drawCard(),"Empty deck should not reshuffle. Only round changes cause reshuffle");
         assertEquals(0,allCards.size());
     }
 }
