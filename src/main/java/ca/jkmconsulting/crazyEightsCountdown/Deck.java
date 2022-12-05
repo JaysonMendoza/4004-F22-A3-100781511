@@ -1,17 +1,24 @@
 package ca.jkmconsulting.crazyEightsCountdown;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.*;
 
 public class Deck {
+    private final Logger LOG = LoggerFactory.getLogger(Deck.class);
     final private Stack<Card> drawDeck;
     final private ArrayList<Card> cardsIssued;
     final private Stack<Card> discardPile;
+    private final HashSet<DeckObserver> observers;
 
     public Deck(ArrayList<Card> fixedOrder) {
         drawDeck = new Stack<>();
         cardsIssued = new ArrayList<>();
         discardPile = new Stack<>();
+        observers = new HashSet<>();
         buildDeck(fixedOrder);
+        this.LOG.info("Deck created.");
     }
 
     public Deck() {
@@ -48,6 +55,7 @@ public class Deck {
         else {
             drawDeck.addAll(allCards);
         }
+        notifyDeckUpdated();
     }
 
     public int getNumCardsInDeck() {
@@ -60,6 +68,7 @@ public class Deck {
         }
         Card c = drawDeck.pop();
         cardsIssued.add(c);
+        notifyDeckUpdated();
         return c;
     }
 
@@ -67,7 +76,28 @@ public class Deck {
         boolean rc = cardsIssued.remove(card);
         if(rc) {
             discardPile.push(card);
+            notifyDeckUpdated();
         }
         return rc;
+    }
+
+    public boolean subscribeHandUpdates(DeckObserver subscriber) {
+        return observers.add(subscriber);
+    }
+
+    public boolean unsubscribeHandUpdates(DeckObserver subscriber) {
+        return observers.remove(subscriber);
+    }
+
+    private void notifyDeckUpdated() {
+        HashSet<DeckObserver> obs = new HashSet<>(observers);
+        GameBoardUpdate update = new GameBoardUpdate(
+          drawDeck.size(),
+          new ArrayList<>(discardPile)
+        );
+        for(DeckObserver ob : obs) {
+            ob.handleDeckUpdated(update);
+        }
+        this.LOG.info("Deck updated.");
     }
 }

@@ -1,9 +1,9 @@
 package ca.jkmconsulting.crazyEightsCountdown;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public record GameBoardUpdate(
         int numCardsDrawPile,
-        ArrayList<Card> discardPile
+        List<Card> discardPile
 ) {
 } //TODO: Add type to ArrayList declaration once cards are made
