@@ -107,6 +107,14 @@ public class Player {
         return playableCards;
     }
 
+    public boolean subscribeHandUpdates(PlayerHandObserver subscriber) {
+        return false;
+    }
+
+    public boolean unsubscribeHandUpdates(PlayerHandObserver subscriber) {
+        return false;
+    }
+
     private void notifyHandUpdated() {
 
     }

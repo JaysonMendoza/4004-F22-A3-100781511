@@ -89,7 +89,25 @@ class PlayerTest {
 
         //Spades should have three playable cards plus two wildcards (including the spade 8) = 5
         assertEquals(5,p.getPlayableCards(Suit.SPADES).size(),"Spades returned an incorrect size of playable cards");
+    }
 
+    @Test
+    public void I5_playerHandObserver() throws Exception {
+        Player p = new Player("Player1","kkk", UUID.randomUUID().toString());
+        HandObserverMock ob = new HandObserverMock(p); //This will subscribe and throw error if it fails
+        assertFalse(p.subscribeHandUpdates(ob),"Should fail to sub twice");
+        assertTrue(p.addCard(Card.HEARTS_8));
+        assertTrue(ob.hasNext());
+        assertTrue(ob.getNextHandUpdate().contains(Card.HEARTS_8));
+
+        assertTrue(p.removeCard(Card.HEARTS_8));
+        assertTrue(ob.hasNext());
+        assertEquals(0,ob.getNextHandUpdate().size());
+
+        assertTrue(p.unsubscribeHandUpdates(ob));
+        assertFalse(p.unsubscribeHandUpdates(ob),"Should fail to unsub when not subbed");
+        p.addCard(Card.CLUBS_JACK);
+        assertFalse(ob.hasNext());
     }
 
 
