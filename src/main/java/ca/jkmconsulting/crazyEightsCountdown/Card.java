@@ -74,4 +74,14 @@ public enum Card implements Comparable<Card> {
         public int getIndex() {
                 return index;
         }
+
+        public boolean isWildCard() {
+                return switch(this) {
+                        case CLUBS_8 -> true;
+                        case HEARTS_8 -> true;
+                        case SPADES_8 -> true;
+                        case DIAMONDS_8 -> true;
+                        default -> false;
+                };
+        }
 }
