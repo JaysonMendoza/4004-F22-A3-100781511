@@ -73,7 +73,21 @@ public class Player {
      * @return True if the card was successfully removed, False if player didn't have the card in hand or card was null
      */
     public boolean removeCard(Card card) {
-        return false;
+        if(card==null) {
+            this.LOG.error("Player::removeCard: PlayerID '{}', Player '{}' cannot remove a null card to hand",playerID,name);
+            return false;
+        }
+        else if(!hand.remove(card)) {
+            this.LOG.error("Player::removeCard: PlayerID '{}', Player '{}' cannot remove card '{}' because its not in their hand.",playerID,name,card);
+            return false;
+        }
+
+        cardsOfSuit.get(card.suit).remove(card);
+        if(card.isWildCard()) {
+            wildCards.remove(card);
+        }
+        notifyHandUpdated();
+        return true;
     }
 
     private void notifyHandUpdated() {
