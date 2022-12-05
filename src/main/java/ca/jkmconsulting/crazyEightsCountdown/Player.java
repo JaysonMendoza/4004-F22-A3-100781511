@@ -66,6 +66,16 @@ public class Player {
         return true;
     }
 
+    /**
+     * Removes a card from a players hand and updates all observers.
+     * Cards must already exist in a players hand.
+     * @param card The card that will be added to a players hand
+     * @return True if the card was successfully removed, False if player didn't have the card in hand or card was null
+     */
+    public boolean removeCard(Card card) {
+        return false;
+    }
+
     private void notifyHandUpdated() {
 
     }
