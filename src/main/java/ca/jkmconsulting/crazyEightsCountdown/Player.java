@@ -98,7 +98,13 @@ public class Player {
      * @return A list of cards in a players hand that can be played given the current suit
      */
     public ArrayList<Card> getPlayableCards(Suit currentSuit) {
-        return null;
+        ArrayList<Card> playableCards = new ArrayList<>(cardsOfSuit.get(currentSuit));
+        for(Card c : wildCards) {
+            if(!playableCards.contains(c)) {
+                playableCards.add(c);
+            }
+        }
+        return playableCards;
     }
 
     private void notifyHandUpdated() {
