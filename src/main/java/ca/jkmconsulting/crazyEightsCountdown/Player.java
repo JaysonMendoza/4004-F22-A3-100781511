@@ -90,6 +90,17 @@ public class Player {
         return true;
     }
 
+    /**
+     * Returns a list of playable cards.
+     * A card is playable if it's the current suit or if its a wildcard.
+     * In Crazy Eights only 8's are wild
+     * @param currentSuit The suit that should be considered current
+     * @return A list of cards in a players hand that can be played given the current suit
+     */
+    public ArrayList<Card> getPlayableCards(Suit currentSuit) {
+        return null;
+    }
+
     private void notifyHandUpdated() {
 
     }
