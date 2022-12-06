@@ -1,5 +1,9 @@
 package ca.jkmconsulting.crazyEightsCountdown;
 
+import ca.jkmconsulting.crazyEightsCountdown.Enums.AlertTypes;
+import ca.jkmconsulting.crazyEightsCountdown.Enums.Card;
+import ca.jkmconsulting.crazyEightsCountdown.Exceptions.CrazyEightsJoinFailureException;
+import ca.jkmconsulting.crazyEightsCountdown.PayloadDataTypes.AlertData;
 import ca.jkmconsulting.crazyEightsCountdown.PayloadDataTypes.OtherPlayerHandUpdate;
 import ca.jkmconsulting.crazyEightsCountdown.PayloadDataTypes.PlayerUpdate;
 import lombok.AllArgsConstructor;
@@ -30,17 +34,48 @@ public class PlayerManager implements PlayerHandObserver {
     @Autowired
     SimpMessagingTemplate message;
 
+    @Autowired
+    GameController game;
+
     @MessageMapping("/joinGame")
     @SendToUser("/queue/playerRegistered")
-    synchronized public PlayerUpdate registerPlayer(Principal principal, @RequestParam() String name, @Header("simpSessionId") String sessionId) {
+    synchronized public PlayerUpdate registerPlayer(Principal principal, @RequestParam() String name, @Header("simpSessionId") String sessionId) throws CrazyEightsJoinFailureException {
         LOG.info(String.format("Registration request for player %s received. Session: %s, PlayerID: %s",name,sessionId,principal.getName()));
-
         Player player = this.playerPrincipalToPlayer.computeIfAbsent(principal.getName(), k -> new Player(name,sessionId,principal.getName()));
         player.subscribeHandUpdates(this);
-        //todo: register to game
+        try {
+            game.joinGame(player);
+        } catch (CrazyEightsJoinFailureException e) {
+            LOG.info("Rejection message sent to player: '{}': '{}'",player.getName(),e.getMessage());
+            AlertData payload = new AlertData(AlertTypes.BAD,"Registration Rejection",e.getMessage(),false);
+            message.convertAndSendToUser(principal.getName(),"/queue/failedJoin",payload);
+            throw e;
+        }
+
 
         LOG.info("Player '{}' registered successfully!",name);
         return new PlayerUpdate(player.getPlayerID(),player.getName(),null);
+    }
+
+    @MessageMapping("/playCard")
+    synchronized public void handleActionPlayCard(Principal principal,@RequestParam() Card cardEnum) {
+        Player p = this.playerPrincipalToPlayer.get(principal.getName());
+        LOG.info("handleActionPlayCard invoked by playerID '{}' for cardEnum '{}'.",p.getPlayerID(),cardEnum);
+        game.actionPlayerPlayCard(p,cardEnum);
+    }
+
+    @MessageMapping("/DrawCard")
+    synchronized public void handleActionDrawCard(Principal principal) {
+        Player p = this.playerPrincipalToPlayer.get(principal.getName());
+        LOG.info("handleActionDrawCard invoked by playerID '{}'.",p.getPlayerID());
+        game.actionDrawCard(p);
+    }
+
+    @MessageMapping("/suitSelected")
+    synchronized public void handleActionSuitSelected(Principal principal,@RequestParam() Card card) {
+        Player p = this.playerPrincipalToPlayer.get(principal.getName());
+        LOG.info("handleActionSuitSelected invoked by playerID '{}' for cardEnum '{}'.",p.getPlayerID(),card);
+        game.actionSelectSuit(p,card.suit);
     }
 
     @Override
