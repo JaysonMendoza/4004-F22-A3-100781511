@@ -8,18 +8,19 @@ export default function PopUpMessage(props) {
     function closeButton(event) {
         setVisible(false);
     }
+    console.log("Popup:",props.title);
 
     return (
         <>
-            <Modal show={isVisible} centered size='lg'>
-                <Modal.Header closeButton>
+            <Modal id="popAlert" show={isVisible} centered size='lg'>
+                <Modal.Header id="popTitle"closeButton>
                     <Modal.Title>{props.title}</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>
+                <Modal.Body id="popMessage">
                     {props.message}
                 </Modal.Body>
                 <Modal.Footer>
-                    {props.closeButtonText ? <Button onClick={closeButton}>{props.closeButtonText}</Button> : null}
+                    {props.closeButtonText ? <Button id="btnPopClose" onClick={closeButton}>{props.closeButtonText}</Button> : null}
                 </Modal.Footer>
             </Modal>
         </>

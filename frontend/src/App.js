@@ -22,17 +22,17 @@ function App() {
     viewport = <PopUpMessage show={true} title="Waiting for Game Start" message="Please wait for all players to connect and game to begin!"/>;
   }
   else {
-    // viewport = <RegistrationForm/>;
+    viewport = <RegistrationForm/>;
     // viewport = <PlayingCard onClick={(e) => console.log("cardClick",e)} cardEnum="CLUBS_JACK" isSelected={false}/> .
-    viewport = <GameBoard/>
+    // viewport = <GameBoard/>
   }
   return (
     <div className="App">
       <Container style={{ backgroundImage : `url(${background})`, minHeight: '100vh', minWidth: '100vw',backgroundSize : 'cover'}}>
-        <Row>
+        <Row style={{height: '70vh'}}>
           {viewport}
         </Row>
-        <Row>
+        <Row style={{height: '30vh'}}>
           <HeadsUpDisplay/>
         </Row>
       </Container>

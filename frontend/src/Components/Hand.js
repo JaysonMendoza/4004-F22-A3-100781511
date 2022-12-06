@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import { CardGroup , Container, Row, Col, Button} from 'react-bootstrap'
+import { CardGroup , Container, Row, Col, Button, CardDeck} from 'react-bootstrap'
 import { usePlayerStore } from '../Services/Stores'
 import PlayingCard from './PlayingCard'
 import { actionPlayCard } from '../Services/SocketHandler'
@@ -33,7 +33,7 @@ export default function Hand(props) {
                     {selectedCard ? <Button onClick={(e) => actionPlayCard(selectedCard)}>Play Card</Button> : null}
                 </Col>
             </Row>
-            <Row>
+            <Row className="g-10">
                 <Col>
                     <CardGroup>
                         {allCards}

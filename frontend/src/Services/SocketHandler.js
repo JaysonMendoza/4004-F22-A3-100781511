@@ -13,7 +13,8 @@ const client = new Client(
         heartbeatOutgoing: 4000,
         onConnect: onWsConnected,
         debug : (out) => { console.log(out)},
-        onUnhandledMessage: (out) => console.log("Unhandled: "+out)
+        onUnhandledMessage: (out) => console.log("Unhandled: "+out),
+        onDisconnect : ()=> console.log("Ws disconnected!")
     }
 );
 

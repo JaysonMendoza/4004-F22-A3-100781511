@@ -7,15 +7,14 @@ export default function PlayingCard(props) {
     let cardImage = props.cardEnum ? Cards[props.cardEnum] : blankCard;
     let cardImageAlt = props.cardEnum ? props.cardEnum : "No Card";
     let wSize;
-    let borderColour = props.isSelected ? "primary" : "light";
     if(props.isSelected===true) {
-        wSize = {width: '8rem'};
+        wSize = {width: '10vh', borderColour : 'red', border : '2px solid'};
     }
     else if(props.isSelected===false) {
-        wSize = {width:'6rem'};
+        wSize = {width:'8vh'};
     }
     else {
-        wSize = {width : '4rem'};
+        wSize = {width : '6vh'};
     }
 
     function handleClick(event) {
@@ -26,8 +25,8 @@ export default function PlayingCard(props) {
     }
 
     return (
-        <Card style={wSize} onClick={handleClick} border={borderColour} bg={props.isSelected ? borderColour : null}>
-            <Card.Img src={cardImage} alt={cardImageAlt}/>
+        <Card className={props.className} onClick={handleClick} style={{backgroundColor : 'transparent',}}>
+            <Card.Img style={wSize} src={cardImage} alt={cardImageAlt}/>
         </Card>
     );
 }

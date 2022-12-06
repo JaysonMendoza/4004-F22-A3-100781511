@@ -25,7 +25,7 @@ function RegistrationForm(props) {
                             <Form.Control type="text" placeholder="Enter Name" />
                             <Form.Text className="text-muted">This is how you appear on the scoreboard and in messages</Form.Text>
                         </Form.Group>
-                        <Button variant="primary" type="submit">Register</Button>
+                        <Button id='btnRegister' variant="primary" type="submit">Register</Button>
                     </Form>
                 </Modal.Body>
             </Modal>

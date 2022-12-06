@@ -10,18 +10,22 @@ import OtherHand from './OtherHand';
     let otherPlayerViews = [];
 
     for(const p of otherPlayerHands) {
-        otherPlayerViews.push(<Row><OtherHand name={p.playerName} numCards={p.numCards}/></Row>)
+        otherPlayerViews.push(<div><OtherHand name={p.playerName} numCards={p.numCards}/></div>)
     }
 
     return (
-        <Container fluid>
-
-            {otherPlayerViews}
+        <Container>
             <Row>
-                <DeckArea/>
+                <Stack gap={1}  style={{height : '30vh'}}>
+                    {otherPlayerViews}
+                </Stack>
+            </Row>
+            
+            <Row>
+                <DeckArea  style={{height : '20vh'}}/>
             </Row>
             <Row>
-                <Hand/>
+                <Hand style={{height : '20vh'}}/>
             </Row>
         </Container>
     );
