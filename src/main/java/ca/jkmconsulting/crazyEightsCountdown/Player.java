@@ -50,6 +50,10 @@ public class Player {
         isTurnSkipped = turnSkipped;
     }
 
+    public boolean isHandEmpty() {
+        return hand.isEmpty();
+    }
+
     public Player(String name, String sessionID, String playerID) {
         this.sessionID = sessionID;
         this.playerID = playerID;

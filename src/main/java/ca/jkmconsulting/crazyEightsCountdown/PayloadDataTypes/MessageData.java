@@ -1,6 +1,6 @@
 package ca.jkmconsulting.crazyEightsCountdown.PayloadDataTypes;
 
-public record Message(
+public record MessageData(
         String senderName,
         String message
 ) {

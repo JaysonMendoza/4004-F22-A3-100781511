@@ -5,10 +5,7 @@ import ca.jkmconsulting.crazyEightsCountdown.Enums.Card;
 import ca.jkmconsulting.crazyEightsCountdown.Enums.GameState;
 import ca.jkmconsulting.crazyEightsCountdown.Enums.Suit;
 import ca.jkmconsulting.crazyEightsCountdown.Exceptions.CrazyEightsJoinFailureException;
-import ca.jkmconsulting.crazyEightsCountdown.PayloadDataTypes.AlertData;
-import ca.jkmconsulting.crazyEightsCountdown.PayloadDataTypes.GameBoardUpdate;
-import ca.jkmconsulting.crazyEightsCountdown.PayloadDataTypes.PlayerTurnInfoData;
-import ca.jkmconsulting.crazyEightsCountdown.PayloadDataTypes.TurnOrderUpdate;
+import ca.jkmconsulting.crazyEightsCountdown.PayloadDataTypes.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +14,13 @@ import org.springframework.stereotype.Controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.Locale;
 
 @Controller
 public class GameController implements DeckObserver {
     public final int MAX_PLAYERS = 1;
+    public final int END_CONDITION_SCORE_THRESHOLD =100;
+    public final int STARTING_HAND_SIZE = 5;
     private GameState state;
     private final Logger LOG = LoggerFactory.getLogger(GameController.class);
     private final ArrayList<Player> players = new ArrayList<>();
@@ -30,6 +29,7 @@ public class GameController implements DeckObserver {
     private int round;
     private boolean isReverseTurnOrder;
     private boolean isPickupTwo;
+    private int cardsToPickup;
     private Player currentPlayer;
     private Deck deck;
 
@@ -41,18 +41,25 @@ public class GameController implements DeckObserver {
         state = GameState.OPEN;
         isReverseTurnOrder=false;
         idxTurnOrder=0;
+        cardsToPickup=0;
         isPickupTwo=false;
     }
 
     public void setupGame() {
         deck = new Deck();
         round=0;
+        cardsToPickup=0;
         initTurnOrder();
 
     }
     public void startGame() {
         state = GameState.RUNNING;
 
+        dealStartingHand();
+        //send start game signal
+        message.convertAndSend("/topic/startGame",(Object)null);
+        sendGlobalMessage(null,String.format("The game begins with player %s!",currentPlayer.getName()));
+        startTurn(true);
     }
 
     /**
@@ -92,6 +99,22 @@ public class GameController implements DeckObserver {
         }
         currentPlayer = players.get(idxTurnOrder);
         sendPlayerTurnOrderDataUpdate();
+        startTurn(false);
+    }
+
+    private void startTurn(boolean isNewRound) {
+        if(isNewRound) {
+            sendAlert(currentPlayer,new AlertData(AlertTypes.NEUTRAL,"Your Turn : New Round","You get to off a new round. Play any card!",true));
+        }
+        if(isPickupTwo) {
+            message.convertAndSendToUser(currentPlayer.getSessionID(),"/queue/alert",new AlertData(AlertTypes.BAD,"Your Turn : Pickup 2",String.format("You must either play 2 cards immediately, or draw 2 cards. You may play any EIGHT, or a card of the suit %s",deck.getTopDiscardedCard().suit),true));
+            sendGlobalMessage(null,String.format("Player %s begins their turn and must pickup 2 cards!",currentPlayer.getName()));
+            cardsToPickup=2;
+        }
+        else {
+            message.convertAndSendToUser(currentPlayer.getSessionID(),"/queue/alert",new AlertData(AlertTypes.NEUTRAL,"Your Turn!",String.format("It's your turn. Play a card. You may play any EIGHT, or a card of the suit %s",deck.getTopDiscardedCard().suit),true));
+            sendGlobalMessage(null,String.format("Player %s begins their turn!",currentPlayer.getName()));
+        }
     }
 
     private void nextRound() {
@@ -99,15 +122,68 @@ public class GameController implements DeckObserver {
         idxTurnOrder = (round-1) % players.size();
         isReverseTurnOrder = false;
         isPickupTwo = false;
+        cardsToPickup=0;
         for(Player p : players) {
             p.endOfRound();
         }
         updateRanks();
-
+        deck=new Deck();
+        dealStartingHand();
+        sendPlayerTurnOrderDataUpdate();
+        checkEndGameConditions();
+        startTurn(true);
     }
 
-    public void EndGame() {
-        state = GameState.ENDED;
+    public void endGame() {
+        for(Player p: players) {
+            if(p.getRank()==1) {
+                message.convertAndSendToUser(p.getSessionID(),"/queue/gameEnded",new AlertData(AlertTypes.GOOD,"You Win The Game!",String.format("Congratulations, you are among the winners with %d points!",p.getScore()),false));
+                this.LOG.info("Player '{}' with playerID '{}' has been declared a winner with a rank of '{}' and score of '{}'.",p.getName(),p.getPlayerID(),p.getRank(),p.getScore());
+            }
+            else {
+                message.convertAndSendToUser(p.getSessionID(),"/queue/gameEnded",new AlertData(AlertTypes.BAD,"You Loose The Game!",String.format("You loose the game with %d points. Better luck next time!",p.getScore()),false));
+            }
+        }
+        players.clear();
+        playerIdToPlayer.clear();
+        currentPlayer = null;
+        deck = null;
+        isReverseTurnOrder=false;
+        idxTurnOrder=0;
+        isPickupTwo=false;
+        cardsToPickup=0;
+        this.LOG.info("Game has been closed!");
+    }
+
+    /**
+     * Game ends when END_CONDITION_SCORE_THRESHOLD is reached by any player
+     */
+    private void checkEndGameConditions() {
+        for(Player p : players) {
+            if(p.getScore()>=END_CONDITION_SCORE_THRESHOLD) {
+                state = GameState.ENDED;
+                break;
+            }
+        }
+        if(state == GameState.ENDED) {
+            endGame();
+        }
+    }
+
+    /**
+     * Round ends when the deck is empty or any one player has played their last card
+     */
+    private void checkEndRoundConditions() {
+        boolean isRoundOver = deck.getNumCardsInDeck()==0;
+        for(Player p : players) {
+            if(isRoundOver || p.isHandEmpty()) {
+                isRoundOver=true;
+                break;
+            }
+        }
+        if(isRoundOver) {
+            nextRound();
+        }
     }
 
     @Override
@@ -137,7 +213,7 @@ public class GameController implements DeckObserver {
     }
 
     public void actionPlayerPlayCard(Player player, Card card) {
-
+//        cardsToPickup
     }
 
     public void actionDrawCard(Player player) {
@@ -148,8 +224,13 @@ public class GameController implements DeckObserver {
 
     }
 
-    public void notifyInitialGameState() {
-
+    private void dealStartingHand() {
+        //Deal each player a new hand
+        for(Player p : players) {
+            for(int i=0;i<STARTING_HAND_SIZE;++i) {
+                p.addCard(deck.drawCard());
+            }
+        }
     }
 
     private void sendPlayerTurnOrderDataUpdate() {
@@ -209,4 +290,10 @@ public class GameController implements DeckObserver {
         this.LOG.info("PlayerID '{}' sent alert of type '{}' and message '{}'",player.getPlayerID(),data.type(),data.message());
         message.convertAndSendToUser(player.getSessionID(),"/queue/alert",data);
     }
+
+    private void sendGlobalMessage(Player sender,String msg) {
+        String senderName = sender==null ? "GAME" : sender.getName().toUpperCase(Locale.ROOT);
+        message.convertAndSend("/topic/messageReceived",new MessageData(senderName,msg));
+    }
+
 }

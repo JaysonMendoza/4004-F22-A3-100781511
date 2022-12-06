@@ -46,7 +46,8 @@ function onWsConnected(frame) {
     client.subscribe("/topic/updateGameBoard",handleUpdateGameBoard);
     client.subscribe("/user/queue/OtherPlayerUpdated",handleOtherPlayerUpdated); 
     client.subscribe("/user/queue/failedJoin",handleFailedJoin);
-    client.subscribe("/user/queue/alert",handleAlert);  
+    client.subscribe("/user/queue/alert",handleAlert);
+    client.subscribe("/user/queue/gameEnded",handleGameEnded);  
 }
 
 
@@ -54,7 +55,14 @@ function onWsConnected(frame) {
  * TOPIC HANDLERS
  */
 
-
+function handleGameEnded(response) {
+    console.log("handleGameEnded!");
+    useGameStateStore.getState().setIsGameStarted(false);
+    useGameStateStore.getState().setIsRegistered(false);
+    useGameStateStore.getState().setIsConnected(false);
+    handleAlert(response);
+    client.deactivate();
+}
 function handleFailedJoin(response) {
     console.log("Player failed to join game!");
     useGameStateStore.getState().setIsConnected(false);
@@ -146,7 +154,7 @@ function handleMessageReceived(response) {
         console.error("handleMessageReceived recieved malformed data.")
         return;
     }
-    let line = `${data.senderName}: ${data.message}`;
+    let line = `[${data.senderName}]: ${data.message}`;
     useMessageStore.getState().add(line);
 }
 
