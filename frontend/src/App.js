@@ -11,12 +11,19 @@ import Hand from './Components/Hand';
 import OtherHand from './Components/OtherHand';
 import DeckArea from './Components/DeckArea';
 import HeadsUpDisplay from './Components/HeadsUpDisplay';
+import AlertPopUp from './Components/AlertPopUp';
 
 function App() {
-  const [isGameStarted,isRegistered] = useGameStateStore((state) => [state.isGameStarted,state.isRegistered]);
+  const [isGameStarted,isRegistered,isConnected] = useGameStateStore((state) => [state.isGameStarted,state.isRegistered,state.isConnected]);
+  
   let viewport;
+
   if(isGameStarted) {
     viewport=<GameBoard/>;
+  }
+  else if(isRegistered && !isConnected) {
+    //Lost Connection
+    viewport = <PopUpMessage show={true} title="Lost Connection" message="Game has lost connection! Attempting to reconnect..."/>;
   }
   else if(isRegistered) {
     viewport = <PopUpMessage show={true} title="Waiting for Game Start" message="Please wait for all players to connect and game to begin!"/>;
@@ -33,6 +40,7 @@ function App() {
           {viewport}
         </Row>
         <Row style={{height: '30vh'}}>
+          <AlertPopUp/>
           <HeadsUpDisplay/>
         </Row>
       </Container>

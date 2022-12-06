@@ -34,16 +34,37 @@ function onWsConnected(frame) {
     client.subscribe("/user/queue/playerUpdated",handlePlayerUpdated);
     client.subscribe("/user/queue/playerRegistered",handlePlayerRegistered);
     client.subscribe("/user/queue/messageReceived",handleMessageReceived);
+    client.subscribe("/user/queue/selectSuit",handleSelectSuit);
     client.subscribe("/topic/messageReceived",handleMessageReceived);
     client.subscribe("/topic/updateTurnOrder",handleUpdateTurnOrder);
     client.subscribe("/topic/updateGameBoard",handleUpdateGameBoard);
-    client.subscribe("/user/queue/OtherPlayerUpdated",handleOtherPlayerUpdated);   
+    client.subscribe("/user/queue/OtherPlayerUpdated",handleOtherPlayerUpdated); 
+    client.subscribe("/user/queue/failedJoin",handleFailedJoin);
+    client.subscribe("/user/queue/alert",handleAlert);  
 }
 
 
 /**
  * TOPIC HANDLERS
  */
+
+
+function handleFailedJoin(response) {
+    console.log("Player failed to join game!");
+    useGameStateStore.getState().setIsConnected(false);
+    client.deactivate();
+    handleAlert(response);
+}
+
+function handleAlert(response) {
+    console.log("Alert recieved!");
+    let data = JSON.parse(response.body);
+    if ( !(data.hasOwnProperty("type") && data.hasOwnProperty("title") && data.hasOwnProperty("message") && data.hasOwnProperty("isClosable")) ) {
+        console.error("handleAlert recieved malformed data.")
+        return;
+    }
+    useMessageStore.getState().setAlert(data);
+}
 
 function handlePlayerRegistered(response) {
     console.log("handlePlayerRegistered():",response.body)
@@ -123,6 +144,11 @@ function handleMessageReceived(response) {
     useMessageStore.getState().add(line);
 }
 
+function handleSelectSuit(response) {
+    console.log("Server requested player select suit.");
+    usePlayerStore.getState().setIsSelectingSuit(true);
+}
+
 /**
  * ACTION HANDLERS (MUST EXPORT)
  */
@@ -136,11 +162,25 @@ export function actionRegisterPlayer(name) {
 
 export function actionPlayCard(cardEnum) {
     console.log("actionPlayCard:",cardEnum);
+    client.publish({
+        destination: "/app/playCard",
+        cardEnum : cardEnum
+    });
 }
 
 export function actionDrawCard() {
     console.log("actionDrawCard");
+    client.publish({
+        destination: "/app/DrawCard"
+    });
 }
 
+export function actionSelectSuit(suit) {
+    console.log("actionSelectSuit",suit);
+    client.publish({
+        destination: "/app/suitSelected",
+        card : suit
+    });
+}
 
 
