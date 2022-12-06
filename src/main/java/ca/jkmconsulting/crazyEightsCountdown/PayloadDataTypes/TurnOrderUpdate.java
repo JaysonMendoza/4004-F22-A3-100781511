@@ -3,7 +3,7 @@ package ca.jkmconsulting.crazyEightsCountdown.PayloadDataTypes;
 import java.util.ArrayList;
 
 public record TurnOrderUpdate(
-        ArrayList<PlayerTurnInfo> turnSequence,
+        ArrayList<PlayerTurnInfoData> turnSequence,
         boolean isPlayReversed,
         int round
 ) {

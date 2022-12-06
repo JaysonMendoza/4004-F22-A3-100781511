@@ -1,6 +1,6 @@
 package ca.jkmconsulting.crazyEightsCountdown.PayloadDataTypes;
 
-public record PlayerTurnInfo(
+public record PlayerTurnInfoData(
         String playerID,
         String playerName,
         int rank,

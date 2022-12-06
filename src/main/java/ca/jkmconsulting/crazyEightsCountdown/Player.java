@@ -3,10 +3,12 @@ package ca.jkmconsulting.crazyEightsCountdown;
 import ca.jkmconsulting.crazyEightsCountdown.Enums.Card;
 import ca.jkmconsulting.crazyEightsCountdown.Enums.Suit;
 import ca.jkmconsulting.crazyEightsCountdown.PayloadDataTypes.OtherPlayerHandUpdate;
+import ca.jkmconsulting.crazyEightsCountdown.PayloadDataTypes.PlayerTurnInfoData;
 import ca.jkmconsulting.crazyEightsCountdown.PayloadDataTypes.PlayerUpdate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.management.PlatformLoggingMXBean;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,8 +22,35 @@ public class Player {
     private final HashMap<Suit,ArrayList<Card>> cardsOfSuit;
     private final ArrayList<Card> wildCards;
     private final HashSet<PlayerHandObserver> observers;
+    private int rank;
+    private int score;
+    private boolean isTurnSkipped;
 
-    public Player(String name,String sessionID,String playerID) {
+    public int getRank() {
+        return rank;
+    }
+
+    public void setRank(int rank) {
+        this.rank = rank;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public boolean isTurnSkipped() {
+        return isTurnSkipped;
+    }
+
+    public void setTurnSkipped(boolean turnSkipped) {
+        isTurnSkipped = turnSkipped;
+    }
+
+    public Player(String name, String sessionID, String playerID) {
         this.sessionID = sessionID;
         this.playerID = playerID;
         this.name = name;
@@ -95,6 +124,20 @@ public class Player {
         }
         notifyHandUpdated();
         return true;
+    }
+
+    public int endOfRound() {
+        for(Card c : hand) {
+            score+=switch(c.getRank()) {
+                case EIGHT -> 50;
+                case JACK,QUEEN,KING,ACE -> 10;
+                default -> c.getRank().rank;
+            };
+        }
+        hand.clear();
+        isTurnSkipped=false;
+        notifyHandUpdated();
+        return score;
     }
 
     /**
