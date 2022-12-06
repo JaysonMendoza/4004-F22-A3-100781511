@@ -1,4 +1,4 @@
-package ca.jkmconsulting.crazyEightsCountdown;
+package ca.jkmconsulting.crazyEightsCountdown.PayloadDataTypes;
 
 public record OtherPlayerHandUpdate(
         String playerID,

@@ -1,4 +1,6 @@
-package ca.jkmconsulting.crazyEightsCountdown;
+package ca.jkmconsulting.crazyEightsCountdown.PayloadDataTypes;
+
+import ca.jkmconsulting.crazyEightsCountdown.Enums.Card;
 
 import java.util.ArrayList;
 

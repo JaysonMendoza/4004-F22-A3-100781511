@@ -17,16 +17,16 @@ export default function DeckArea(props) {
    return (
     <Container>
         <Row>
-            <Col>
+            <Col style={{textAlign : 'right'}}>
                 <h5 style={{color : 'white'}}>Deck</h5>
             </Col>
-            <Col>
+            <Col style={{textAlign : 'left'}}>
                 <h5 style={{color : 'white'}}>Discard Pile</h5>
             </Col>
         </Row>
         <Row>
             <Col>
-                <PlayingCard cardEnum="CARDBACK" onSelect={() => actionDrawCard()} isSelected={false}/>
+                <PlayingCard className="ml-auto" cardEnum="CARDBACK" onSelect={() => actionDrawCard()} isSelected={false}/>
             </Col>
             <Col>
                 {topCard}

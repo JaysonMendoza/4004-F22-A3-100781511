@@ -1,5 +1,8 @@
 package ca.jkmconsulting.crazyEightsCountdown;
 
+import ca.jkmconsulting.crazyEightsCountdown.Enums.Card;
+import ca.jkmconsulting.crazyEightsCountdown.PayloadDataTypes.OtherPlayerHandUpdate;
+import ca.jkmconsulting.crazyEightsCountdown.PayloadDataTypes.PlayerUpdate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +27,7 @@ public class HandObserverMock implements PlayerHandObserver {
     }
 
     @Override
-    public void handlePlayerHandUpdate(Player player,PlayerUpdate updatePlayer, OtherPlayerHandUpdate updateOther) {
+    public void handlePlayerHandUpdate(Player player, PlayerUpdate updatePlayer, OtherPlayerHandUpdate updateOther) {
         this.LOG.info("Hand Update Received for playerID '{}' with size '{}'",player.getPlayerID(),updatePlayer.cards().size());
         updatesRecieved.add(updatePlayer.cards());
     }

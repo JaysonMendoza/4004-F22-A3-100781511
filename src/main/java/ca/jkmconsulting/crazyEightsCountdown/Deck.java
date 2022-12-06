@@ -1,5 +1,7 @@
 package ca.jkmconsulting.crazyEightsCountdown;
 
+import ca.jkmconsulting.crazyEightsCountdown.Enums.Card;
+import ca.jkmconsulting.crazyEightsCountdown.PayloadDataTypes.GameBoardUpdate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

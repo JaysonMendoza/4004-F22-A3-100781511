@@ -1,4 +1,4 @@
-package ca.jkmconsulting.crazyEightsCountdown;
+package ca.jkmconsulting.crazyEightsCountdown.PayloadDataTypes;
 
 import java.util.ArrayList;
 

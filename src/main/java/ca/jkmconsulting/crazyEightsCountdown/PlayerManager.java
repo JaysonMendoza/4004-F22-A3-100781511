@@ -1,5 +1,9 @@
 package ca.jkmconsulting.crazyEightsCountdown;
 
+import ca.jkmconsulting.crazyEightsCountdown.PayloadDataTypes.OtherPlayerHandUpdate;
+import ca.jkmconsulting.crazyEightsCountdown.PayloadDataTypes.PlayerUpdate;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +24,7 @@ public class PlayerManager implements PlayerHandObserver {
 
     public PlayerManager() {
         this.playerPrincipalToPlayer = new ConcurrentHashMap<>();
+        this.LOG.info("GameController constructed.");
     }
 
     @Autowired
@@ -27,7 +32,7 @@ public class PlayerManager implements PlayerHandObserver {
 
     @MessageMapping("/joinGame")
     @SendToUser("/queue/playerRegistered")
-    synchronized public PlayerUpdate registerPlayer(Principal principal,@RequestParam() String name,@Header("simpSessionId") String sessionId) {
+    synchronized public PlayerUpdate registerPlayer(Principal principal, @RequestParam() String name, @Header("simpSessionId") String sessionId) {
         LOG.info(String.format("Registration request for player %s received. Session: %s, PlayerID: %s",name,sessionId,principal.getName()));
 
         Player player = this.playerPrincipalToPlayer.computeIfAbsent(principal.getName(), k -> new Player(name,sessionId,principal.getName()));

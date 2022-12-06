@@ -12,7 +12,7 @@ export default function HeadsUpDisplay(props) {
                     <ScoreBoard/>
                 </Col>
                 <Col>
-                    <Console/>
+                    <Console />
                 </Col>
             </Row>
         </Container>

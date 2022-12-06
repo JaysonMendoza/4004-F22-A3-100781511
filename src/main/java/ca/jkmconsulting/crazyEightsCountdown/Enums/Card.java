@@ -1,4 +1,4 @@
-package ca.jkmconsulting.crazyEightsCountdown;
+package ca.jkmconsulting.crazyEightsCountdown.Enums;
 public enum Card implements Comparable<Card> {
         CLUBS_2(Suit.CLUBS,CardRank.TWO,0),
         CLUBS_3(Suit.CLUBS,CardRank.THREE,1),

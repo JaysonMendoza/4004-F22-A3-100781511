@@ -1,5 +1,7 @@
 package ca.jkmconsulting.crazyEightsCountdown;
 
+import ca.jkmconsulting.crazyEightsCountdown.Enums.Card;
+import ca.jkmconsulting.crazyEightsCountdown.Enums.Suit;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

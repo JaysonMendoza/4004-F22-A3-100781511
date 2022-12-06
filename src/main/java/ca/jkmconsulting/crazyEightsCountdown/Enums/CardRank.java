@@ -1,4 +1,4 @@
-package ca.jkmconsulting.crazyEightsCountdown;
+package ca.jkmconsulting.crazyEightsCountdown.Enums;
 
 public enum CardRank {
     TWO(2),

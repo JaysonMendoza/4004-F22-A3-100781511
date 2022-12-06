@@ -1,7 +1,8 @@
 package ca.jkmconsulting.crazyEightsCountdown;
 
-import java.util.ArrayList;
+import ca.jkmconsulting.crazyEightsCountdown.PayloadDataTypes.OtherPlayerHandUpdate;
+import ca.jkmconsulting.crazyEightsCountdown.PayloadDataTypes.PlayerUpdate;
 
 public interface PlayerHandObserver {
-    void handlePlayerHandUpdate(Player player,PlayerUpdate updatePlayer, OtherPlayerHandUpdate updateOther);
+    void handlePlayerHandUpdate(Player player, PlayerUpdate updatePlayer, OtherPlayerHandUpdate updateOther);
 }
