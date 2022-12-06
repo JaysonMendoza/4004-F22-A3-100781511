@@ -14,7 +14,8 @@ const client = new Client(
         onConnect: onWsConnected,
         debug : (out) => { console.log(out)},
         onUnhandledMessage: (out) => console.log("Unhandled: "+out),
-        onDisconnect : ()=> console.log("Ws disconnected!")
+        onDisconnect : ()=> console.log("Ws disconnected!"),
+        onWebSocketClose : onWsClosed
     }
 );
 
@@ -22,6 +23,11 @@ console.log("Constructed SocketHandler.js");
 export const connect = async (name) => {
     console.log("Connecting to "+SOCK_SVR)
     client.activate();
+}
+
+function onWsClosed() {
+    console.log("WS lost connection");
+    useGameStateStore.getState().setIsConnected(false);
 }
 
 function onWsConnected(frame) {
@@ -154,6 +160,11 @@ function handleSelectSuit(response) {
  */
 
 export function actionRegisterPlayer(name) {
+    console.log("actionRegisterPlayer",name);
+    if(!client.connected) {
+        onWsClosed();
+        return;
+    }    
     client.publish({
         destination: "/app/joinGame",
         body : name
@@ -162,6 +173,11 @@ export function actionRegisterPlayer(name) {
 
 export function actionPlayCard(cardEnum) {
     console.log("actionPlayCard:",cardEnum);
+
+    if(!client.connected) {
+        onWsClosed();
+        return;
+    }    
     client.publish({
         destination: "/app/playCard",
         cardEnum : cardEnum
@@ -170,6 +186,11 @@ export function actionPlayCard(cardEnum) {
 
 export function actionDrawCard() {
     console.log("actionDrawCard");
+
+    if(!client.connected) {
+        onWsClosed();
+        return;
+    }    
     client.publish({
         destination: "/app/DrawCard"
     });
@@ -177,6 +198,11 @@ export function actionDrawCard() {
 
 export function actionSelectSuit(suit) {
     console.log("actionSelectSuit",suit);
+
+    if(!client.connected) {
+        onWsClosed();
+        return;
+    }    
     client.publish({
         destination: "/app/suitSelected",
         card : suit

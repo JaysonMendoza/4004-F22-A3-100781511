@@ -18,12 +18,13 @@ function App() {
   
   let viewport;
 
-  if(isGameStarted) {
-    viewport=<GameBoard/>;
-  }
-  else if(isRegistered && !isConnected) {
+  if(!isConnected) {
     //Lost Connection
     viewport = <PopUpMessage show={true} title="Lost Connection" message="Game has lost connection! Attempting to reconnect..."/>;
+  }
+  else if(isGameStarted) {
+    viewport=<GameBoard/>;
+    
   }
   else if(isRegistered) {
     viewport = <PopUpMessage show={true} title="Waiting for Game Start" message="Please wait for all players to connect and game to begin!"/>;
