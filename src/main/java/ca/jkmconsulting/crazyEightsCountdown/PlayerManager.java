@@ -2,6 +2,8 @@ package ca.jkmconsulting.crazyEightsCountdown;
 
 import ca.jkmconsulting.crazyEightsCountdown.Enums.AlertTypes;
 import ca.jkmconsulting.crazyEightsCountdown.Enums.Card;
+import ca.jkmconsulting.crazyEightsCountdown.Exceptions.CrazyEightsIllegalCardException;
+import ca.jkmconsulting.crazyEightsCountdown.Exceptions.CrazyEightsInvalidPlayerException;
 import ca.jkmconsulting.crazyEightsCountdown.Exceptions.CrazyEightsJoinFailureException;
 import ca.jkmconsulting.crazyEightsCountdown.PayloadDataTypes.AlertData;
 import ca.jkmconsulting.crazyEightsCountdown.PayloadDataTypes.OtherPlayerHandUpdate;
@@ -58,21 +60,21 @@ public class PlayerManager implements PlayerHandObserver {
     }
 
     @MessageMapping("/playCard")
-    synchronized public void handleActionPlayCard(Principal principal,@RequestParam() Card cardEnum) {
+    synchronized public void handleActionPlayCard(Principal principal,@RequestParam() Card cardEnum) throws CrazyEightsIllegalCardException, CrazyEightsInvalidPlayerException {
         Player p = this.playerPrincipalToPlayer.get(principal.getName());
         LOG.info("handleActionPlayCard invoked by playerID '{}' for cardEnum '{}'.",p.getPlayerID(),cardEnum);
         game.actionPlayerPlayCard(p,cardEnum);
     }
 
     @MessageMapping("/DrawCard")
-    synchronized public void handleActionDrawCard(Principal principal) {
+    synchronized public void handleActionDrawCard(Principal principal) throws CrazyEightsIllegalCardException, CrazyEightsInvalidPlayerException {
         Player p = this.playerPrincipalToPlayer.get(principal.getName());
         LOG.info("handleActionDrawCard invoked by playerID '{}'.",p.getPlayerID());
         game.actionDrawCard(p);
     }
 
     @MessageMapping("/suitSelected")
-    synchronized public void handleActionSuitSelected(Principal principal,@RequestParam() Card card) {
+    synchronized public void handleActionSuitSelected(Principal principal,@RequestParam() Card card) throws CrazyEightsInvalidPlayerException {
         Player p = this.playerPrincipalToPlayer.get(principal.getName());
         LOG.info("handleActionSuitSelected invoked by playerID '{}' for cardEnum '{}'.",p.getPlayerID(),card);
         game.actionSelectSuit(p,card.suit);

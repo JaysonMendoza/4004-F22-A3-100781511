@@ -27,7 +27,7 @@ const exampleTurnOrder = [
     }
 ]
 export const useTurnOrder = create( (set) => ({
-    scores : [...exampleTurnOrder],
+    scores : [],
     isPlayReversed : false,
     round : 0,
     updateTurnInfo : (turnInfo) => set( {scores : turnInfo} ),
@@ -37,10 +37,10 @@ export const useTurnOrder = create( (set) => ({
 
 
 export const usePlayerStore = create( (set) => ({
-    cards : ["CLUBS_8","DIAMONDS_7","SPADES_QUEEN","SPADES_QUEEN","CLUBS_QUEEN","DIAMONDS_ACE","DIAMONDS_5","HEARTS_7","CLUBS_8","DIAMONDS_7","SPADES_QUEEN","SPADES_QUEEN","CLUBS_QUEEN","DIAMONDS_ACE","DIAMONDS_5","HEARTS_7"],
+    cards : [],
     playerID : null,
-    name : "Player 1",
-    isSelectingSuit : true,
+    name : "",
+    isSelectingSuit : false,
     setIsSelectingSuit : (isSuitSelectMode) => set( {isSelectingSuit : isSuitSelectMode} ),
     setPlayerID : (newPlayerID) => set( {playerID : newPlayerID}),
     setPlayerName : (playerName) => set( {name : playerName}),
@@ -63,7 +63,7 @@ const exampleOtherPlayerHands = [
 
 export const useGameBoardStore = create( (set) => ({
     numDrawPileCards : 0,
-    otherPlayerHands : [...exampleOtherPlayerHands],
+    otherPlayerHands : [],
     discardPile: [],
     updateOthPlayerHand: (playerID,numCards) => set( (state) =>state.otherPlayerHands.set(playerID,numCards) ),
     updateDiscardPile : (newDiscardPile) => set({discardPile : newDiscardPile}),
@@ -100,9 +100,12 @@ const exampleAlert = {
     isClosable : false
 }
 export const useMessageStore = create( (set) => ({
-    messages : [...exampleMsg],
+    messages : new Array(),
     alert : null,
-    add : (message) => set( (state) => ({messages: state.add(message)}) ),
+    add : (newMessage) => set( (state) => ({
+        messages : [...state.messages,newMessage]
+
+    })),
     setAlert : (newAlert) => set( {alert: newAlert} ),
     clearAlert : () => set( (state) => ({alert: null}) )
 }))

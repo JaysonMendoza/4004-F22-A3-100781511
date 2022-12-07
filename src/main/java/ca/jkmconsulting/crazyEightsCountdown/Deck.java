@@ -1,6 +1,7 @@
 package ca.jkmconsulting.crazyEightsCountdown;
 
 import ca.jkmconsulting.crazyEightsCountdown.Enums.Card;
+import ca.jkmconsulting.crazyEightsCountdown.Enums.Suit;
 import ca.jkmconsulting.crazyEightsCountdown.PayloadDataTypes.GameBoardUpdate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,7 @@ public class Deck {
     final private ArrayList<Card> cardsIssued;
     final private Stack<Card> discardPile;
     private final HashSet<DeckObserver> observers;
+    private Suit activeSuit;
 
     public Deck(ArrayList<Card> fixedOrder) {
         drawDeck = new Stack<>();
@@ -21,6 +23,7 @@ public class Deck {
         observers = new HashSet<>();
         buildDeck(fixedOrder);
         this.LOG.info("Deck created.");
+        activeSuit=null;
     }
 
     public Deck() {
@@ -31,14 +34,18 @@ public class Deck {
         return discardPile.stream().toList();
     }
 
-    public Card getTopDiscardedCard() {
-        return discardPile.peek();
+    public Suit getActiveSuit() {
+        return activeSuit;
     }
 
+    public void setActiveSuit(Suit newActiveSuit) {
+        activeSuit = newActiveSuit;
+    }
     private void buildDeck(ArrayList<Card> cardOrder) {
         drawDeck.clear();
         discardPile.clear();
         cardsIssued.clear();
+        activeSuit=null;
         ArrayList<Card> allCards = new ArrayList<>(Arrays.asList(Card.values()));
         Collections.shuffle(allCards);
 //        ArrayList<Card> order = cardOrder;
@@ -75,6 +82,9 @@ public class Deck {
     }
 
     public boolean discardCard(Card card) {
+        if( !(card.isWildCard() || card.getSuit()==activeSuit) ) {
+            return false;
+        }
         boolean rc = cardsIssued.remove(card);
         if(rc) {
             discardPile.push(card);

@@ -71,8 +71,9 @@ function handleFailedJoin(response) {
 }
 
 function handleAlert(response) {
-    console.log("Alert recieved!");
     let data = JSON.parse(response.body);
+    console.log("Alert recieved!",data);
+
     if ( !(data.hasOwnProperty("type") && data.hasOwnProperty("title") && data.hasOwnProperty("message") && data.hasOwnProperty("isClosable")) ) {
         console.error("handleAlert recieved malformed data.")
         return;
@@ -106,13 +107,17 @@ function handlePlayerUpdated(response) {
         console.error("Update recieved for invalid player. Player "+usePlayerStore.getState().playerID+" cannot be updated with playerID "+response.playerID);
         return;
     }
-    usePlayerStore.getState().update(data.cards);
+    let cards = data.cards;
+    if(cards===null) {
+        cards = [];
+    }
+    usePlayerStore.getState().update(cards);
     console.log("PlayerID: "+usePlayerStore.getState().playerID+" hand updated!"); 
 }
 
 function handleStartGame(response) {
     console.log("Starting game!");
-    useGameStateStore.setIsGameStarted(true);
+    useGameStateStore.getState().setIsGameStarted(true);
 }
 
 function handleUpdateTurnOrder(response) {

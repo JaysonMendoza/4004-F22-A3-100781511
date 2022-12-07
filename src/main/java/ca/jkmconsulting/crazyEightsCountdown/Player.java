@@ -50,8 +50,16 @@ public class Player {
         isTurnSkipped = turnSkipped;
     }
 
-    public boolean isHandEmpty() {
-        return hand.isEmpty();
+    public int getHandSize() {
+        return hand.size();
+    }
+
+    public int getNumWildcards() {
+        return wildCards.size();
+    }
+
+    public boolean hasCardInHand(Card card) {
+        return hand.contains(card);
     }
 
     public Player(String name, String sessionID, String playerID) {
