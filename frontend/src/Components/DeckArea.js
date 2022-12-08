@@ -7,8 +7,9 @@ import { actionDrawCard } from '../Services/SocketHandler'
 export default function DeckArea(props) {
    const [numDrawPile,discardPile] = useGameBoardStore((state) => [state.numDrawPile,state.discardPile]);
     let topCard;
+    console.log("Drawing discard pile",discardPile);
     if(discardPile.length>0) {
-        topCard = <PlayingCard cardEnum={discardPile[-1]} isSelected={false}/>;
+        topCard = <PlayingCard cardEnum={discardPile[discardPile.length-1]} isSelected={false}/>;
     }
     else {
         topCard = <PlayingCard isSelected={false}/>

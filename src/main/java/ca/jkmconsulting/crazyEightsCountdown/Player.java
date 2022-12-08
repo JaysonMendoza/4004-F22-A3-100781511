@@ -1,6 +1,7 @@
 package ca.jkmconsulting.crazyEightsCountdown;
 
 import ca.jkmconsulting.crazyEightsCountdown.Enums.Card;
+import ca.jkmconsulting.crazyEightsCountdown.Enums.CardRank;
 import ca.jkmconsulting.crazyEightsCountdown.Enums.Suit;
 import ca.jkmconsulting.crazyEightsCountdown.PayloadDataTypes.OtherPlayerHandUpdate;
 import ca.jkmconsulting.crazyEightsCountdown.PayloadDataTypes.PlayerTurnInfoData;
@@ -9,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.management.PlatformLoggingMXBean;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,6 +21,7 @@ public class Player {
     private final String playerID;
     private String name;
     private final ArrayList<Card> hand;
+    private final HashMap<CardRank,ArrayList<Card>> cardsByRank;
     private final HashMap<Suit,ArrayList<Card>> cardsOfSuit;
     private final ArrayList<Card> wildCards;
     private final HashSet<PlayerHandObserver> observers;
@@ -70,6 +73,7 @@ public class Player {
         wildCards = new ArrayList<>(4);
         cardsOfSuit = new HashMap<>();
         observers = new HashSet<>();
+        cardsByRank = new HashMap<>();
         for(Suit s : Suit.values()) {
             cardsOfSuit.put(s,new ArrayList<>());
         }
@@ -107,6 +111,9 @@ public class Player {
 
         hand.add(card);
         cardsOfSuit.get(card.suit).add(card);
+        ArrayList<Card> cardsAtRank = cardsByRank.getOrDefault(card.getRank(),new ArrayList<>());
+        cardsAtRank.add(card);
+        cardsByRank.put(card.getRank(),cardsAtRank);
         if(card.isWildCard()) {
             wildCards.add(card);
         }
@@ -131,6 +138,7 @@ public class Player {
         }
 
         cardsOfSuit.get(card.suit).remove(card);
+        cardsByRank.get(card.rank).remove(card);
         if(card.isWildCard()) {
             wildCards.remove(card);
         }
@@ -159,14 +167,18 @@ public class Player {
      * @param currentSuit The suit that should be considered current
      * @return A list of cards in a players hand that can be played given the current suit
      */
-    public ArrayList<Card> getPlayableCards(Suit currentSuit) {
-        ArrayList<Card> playableCards = new ArrayList<>(cardsOfSuit.get(currentSuit));
-        for(Card c : wildCards) {
-            if(!playableCards.contains(c)) {
-                playableCards.add(c);
-            }
-        }
-        return playableCards;
+    public ArrayList<Card> getPlayableCards(Suit currentSuit,CardRank cardRank) {
+        HashSet<Card> cards = new HashSet<>();
+        cards.addAll(cardsOfSuit.get(currentSuit));
+        cards.addAll(cardsByRank.getOrDefault(cardRank,new ArrayList<>()));
+        cards.addAll(wildCards);
+        return new ArrayList<>(cards);
+//        for(Card c : wildCards) {
+//            if(!playableCards.contains(c)) {
+//                playableCards.add(c);
+//            }
+//        }
+//        return playableCards;
     }
 
     public boolean subscribeHandUpdates(PlayerHandObserver subscriber) {
@@ -178,10 +190,14 @@ public class Player {
     }
 
     private void notifyHandUpdated() {
+        ArrayList<String> cards = new ArrayList<>();
+        for(Card c : hand) {
+            cards.add(c.toString());
+        }
         PlayerUpdate pu = new PlayerUpdate(
                 playerID,
                 name,
-                hand
+                cards
         );
         OtherPlayerHandUpdate opu = new OtherPlayerHandUpdate(
           playerID,

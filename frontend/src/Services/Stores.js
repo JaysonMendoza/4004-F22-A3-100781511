@@ -60,7 +60,7 @@ const exampleOtherPlayerHands = [
         numCards : 3
     }
 ];
-
+//TODO: Need to fix other player hands because this implementation doesn't work
 export const useGameBoardStore = create( (set) => ({
     numDrawPileCards : 0,
     otherPlayerHands : [],

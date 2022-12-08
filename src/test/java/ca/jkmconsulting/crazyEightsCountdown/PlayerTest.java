@@ -1,6 +1,7 @@
 package ca.jkmconsulting.crazyEightsCountdown;
 
 import ca.jkmconsulting.crazyEightsCountdown.Enums.Card;
+import ca.jkmconsulting.crazyEightsCountdown.Enums.CardRank;
 import ca.jkmconsulting.crazyEightsCountdown.Enums.Suit;
 import org.junit.jupiter.api.Test;
 
@@ -71,26 +72,27 @@ class PlayerTest {
         hand.add(Card.SPADES_KING);
         hand.add(Card.SPADES_8);
         hand.add(Card.SPADES_3);
+        CardRank activeCardRank = CardRank.THREE;
 
-        assertNotNull(p.getPlayableCards(Suit.HEARTS),"should not return null on empty set");
+        assertNotNull(p.getPlayableCards(Suit.HEARTS,activeCardRank),"should not return null on empty set");
 
-        assertEquals(0,p.getPlayableCards(Suit.SPADES).size(),"Should return size zero with no cards");
+        assertEquals(0,p.getPlayableCards(Suit.SPADES,activeCardRank).size(),"Should return size zero with no cards");
 
         for(Card c : hand) {
             assertTrue(p.addCard(c));
         }
 
-        //Hearts should have 2 regular hearts plus 2 wildcards (including the heart 8) = 4
-        assertEquals(4,p.getPlayableCards(Suit.HEARTS).size(),"Hearts returned an incorrect size of playable cards");
+        //Hearts should have 2 regular hearts plus 2 wildcards (including the heart 8) plus one 3 = 5
+        assertEquals(5,p.getPlayableCards(Suit.HEARTS,activeCardRank).size(),"Hearts returned an incorrect size of playable cards");
 
-        //Diamonds should have only 2 playable cards because of wildcards only
-        assertEquals(2,p.getPlayableCards(Suit.DIAMONDS).size(),"Diamonds returned an incorrect size of playable cards");
+        //Diamonds should have only 2 Wildcards plus one 3 because = 3
+        assertEquals(3,p.getPlayableCards(Suit.DIAMONDS,activeCardRank).size(),"Diamonds returned an incorrect size of playable cards");
 
-        //Clubs should have 3 regular plus 2 wild = 5
-        assertEquals(5,p.getPlayableCards(Suit.CLUBS).size(),"Clubs returned an incorrect size of playable cards");
+        //Clubs should have 3 regular plus 2 wild  plus one 3 = 5
+        assertEquals(6,p.getPlayableCards(Suit.CLUBS,activeCardRank).size(),"Clubs returned an incorrect size of playable cards");
 
         //Spades should have three playable cards plus two wildcards (including the spade 8) = 5
-        assertEquals(5,p.getPlayableCards(Suit.SPADES).size(),"Spades returned an incorrect size of playable cards");
+        assertEquals(5,p.getPlayableCards(Suit.SPADES,activeCardRank).size(),"Spades returned an incorrect size of playable cards");
     }
 
     @Test

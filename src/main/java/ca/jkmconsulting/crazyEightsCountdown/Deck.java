@@ -1,6 +1,7 @@
 package ca.jkmconsulting.crazyEightsCountdown;
 
 import ca.jkmconsulting.crazyEightsCountdown.Enums.Card;
+import ca.jkmconsulting.crazyEightsCountdown.Enums.CardRank;
 import ca.jkmconsulting.crazyEightsCountdown.Enums.Suit;
 import ca.jkmconsulting.crazyEightsCountdown.PayloadDataTypes.GameBoardUpdate;
 import org.slf4j.Logger;
@@ -15,6 +16,8 @@ public class Deck {
     final private Stack<Card> discardPile;
     private final HashSet<DeckObserver> observers;
     private Suit activeSuit;
+    private CardRank activeCardRank;
+
 
     public Deck(ArrayList<Card> fixedOrder) {
         drawDeck = new Stack<>();
@@ -28,6 +31,10 @@ public class Deck {
 
     public Deck() {
         this(null);
+    }
+
+    public CardRank getActiveCardRank() {
+        return activeCardRank;
     }
 
     public List<Card> getDiscardPile() {
@@ -82,34 +89,38 @@ public class Deck {
     }
 
     public boolean discardCard(Card card) {
-        if( !(card.isWildCard() || card.getSuit()==activeSuit) ) {
+        if( !(activeSuit==null || card.isWildCard() || card.getSuit()==activeSuit || card.getRank()== activeCardRank) ) {
             return false;
         }
         boolean rc = cardsIssued.remove(card);
         if(rc) {
             discardPile.push(card);
+            activeSuit = card.suit;
+            activeCardRank = card.getRank();
             notifyDeckUpdated();
         }
         return rc;
     }
 
-    public boolean subscribeHandUpdates(DeckObserver subscriber) {
+    public boolean subscribeDeckpdates(DeckObserver subscriber) {
         return observers.add(subscriber);
     }
 
-    public boolean unsubscribeHandUpdates(DeckObserver subscriber) {
+    public boolean unsubscribeDeckUpdates(DeckObserver subscriber) {
         return observers.remove(subscriber);
     }
 
     private void notifyDeckUpdated() {
         HashSet<DeckObserver> obs = new HashSet<>(observers);
+        ArrayList<String> cards = new ArrayList<>();
+        discardPile.forEach(c -> cards.add(c.toString()));
         GameBoardUpdate update = new GameBoardUpdate(
           drawDeck.size(),
-          new ArrayList<>(discardPile)
+          cards
         );
+        this.LOG.info("Deck updated.");
         for(DeckObserver ob : obs) {
             ob.handleDeckUpdated(update);
         }
-        this.LOG.info("Deck updated.");
     }
 }

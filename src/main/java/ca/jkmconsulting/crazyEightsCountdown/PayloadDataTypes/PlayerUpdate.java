@@ -7,6 +7,6 @@ import java.util.ArrayList;
 public record PlayerUpdate(
         String playerID,
         String playerName,
-        ArrayList<Card> cards
+        ArrayList<String> cards
 ) {
 }

@@ -12,7 +12,7 @@ export default function PopUpMessage(props) {
 
     return (
         <>
-            <Modal id="popAlert" show={isVisible} centered size='lg'>
+            <Modal id="popMsg" show={isVisible} centered size='lg'>
                 <Modal.Header id="popTitle"closeButton>
                     <Modal.Title>{props.title}</Modal.Title>
                 </Modal.Header>

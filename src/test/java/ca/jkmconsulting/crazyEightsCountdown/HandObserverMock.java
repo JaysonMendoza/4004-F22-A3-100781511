@@ -29,7 +29,9 @@ public class HandObserverMock implements PlayerHandObserver {
     @Override
     public void handlePlayerHandUpdate(Player player, PlayerUpdate updatePlayer, OtherPlayerHandUpdate updateOther) {
         this.LOG.info("Hand Update Received for playerID '{}' with size '{}'",player.getPlayerID(),updatePlayer.cards().size());
-        updatesRecieved.add(updatePlayer.cards());
+        ArrayList<Card> cards = new ArrayList<>();
+        updatePlayer.cards().forEach(c -> Card.valueOf(c));
+        updatesRecieved .add(cards);
     }
 
     public ArrayList<Card> getNextHandUpdate() {

@@ -27,7 +27,7 @@ public class PlayerHandshakeHandler extends DefaultHandshakeHandler {
 //        String playerName = UriComponentsBuilder.newInstance().query(request.getURI().getQuery()).build().getQueryParams().getFirst("name");
 //        Player player = pManager.registerPlayer(playerName);
         String playerID = UUID.randomUUID().toString();
-        LOG.info("User with ID '{}' connected", playerID);
+        LOG.info("User connected and assigned playerID '{}'.", playerID);
         return new UserPrincipal(playerID);
     }
 }

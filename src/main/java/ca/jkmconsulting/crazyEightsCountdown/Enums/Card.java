@@ -1,4 +1,8 @@
 package ca.jkmconsulting.crazyEightsCountdown.Enums;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum Card implements Comparable<Card> {
         CLUBS_2(Suit.CLUBS,CardRank.TWO,0),
         CLUBS_3(Suit.CLUBS,CardRank.THREE,1),

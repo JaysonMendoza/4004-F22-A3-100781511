@@ -47,13 +47,19 @@ function onWsConnected(frame) {
     client.subscribe("/user/queue/OtherPlayerUpdated",handleOtherPlayerUpdated); 
     client.subscribe("/user/queue/failedJoin",handleFailedJoin);
     client.subscribe("/user/queue/alert",handleAlert);
-    client.subscribe("/user/queue/gameEnded",handleGameEnded);  
+    client.subscribe("/user/queue/gameEnded",handleGameEnded);
+    client.subscribe("/topic/askStartGame",handAskStartGame);    
 }
 
 
 /**
  * TOPIC HANDLERS
  */
+
+function handAskStartGame(response) {
+    console.log("handAskStartGame");
+    
+}
 
 function handleGameEnded(response) {
     console.log("handleGameEnded!");
@@ -89,12 +95,12 @@ function handlePlayerRegistered(response) {
         return;
     }
     useGameStateStore.getState().setIsRegistered(true);
-    handlePlayerUpdated(response);
+    // handlePlayerUpdated(response);
 }
 
 function handlePlayerUpdated(response) {
-    console.log("handlePlayerUpdated:",response.body)
     let data = JSON.parse(response.body);
+    console.log("handlePlayerUpdated:",data)
     if ( !(data.hasOwnProperty("playerID") && data.hasOwnProperty("cards")) ) {
         console.error("handleUpdatePlayer recieved malformed data.")
         return;
@@ -121,8 +127,8 @@ function handleStartGame(response) {
 }
 
 function handleUpdateTurnOrder(response) {
-    console.log("Turn Order Update Recieved!");
     let data = JSON.parse(response.body);
+    console.log("Turn Order Update Recieved!",data);
     if ( !(data.hasOwnProperty("turnSequence") && data.hasOwnProperty("isPlayReversed") && data.hasOwnProperty("round") ) ) {
         console.error("handleMessageReceived recieved malformed data.")
         return;
@@ -133,8 +139,8 @@ function handleUpdateTurnOrder(response) {
 }
 
 function handleUpdateGameBoard(response) {
-    console.log("Game Board Update Recieved!");
     let data = JSON.parse(response.body);
+    console.log("Game Board Update Recieved!",data);
     if ( !(data.hasOwnProperty("numCardsDrawPile") && data.hasOwnProperty("discardPile")) || isNaN(data.numCardsDrawPile)) {
         console.error("handleMessageReceived recieved malformed data.")
         return;
@@ -144,8 +150,9 @@ function handleUpdateGameBoard(response) {
 }
 
 function handleOtherPlayerUpdated(response) {
-    console.log("Other Player Update Recieved!");
     let data = JSON.parse(response.body);
+    console.log("Other Player Update Recieved!",data);
+
     if ( !(data.hasOwnProperty("playerID") && data.hasOwnProperty("numCards")) || isNaN(data.numCards)) {
         console.error("handleMessageReceived recieved malformed data.")
         return;
@@ -155,6 +162,7 @@ function handleOtherPlayerUpdated(response) {
 
 function handleMessageReceived(response) {
     let data = JSON.parse(response.body);
+    console.log("handleMessageReceived",data);
     if ( !(data.hasOwnProperty("senderName") && data.hasOwnProperty("message")) ) {
         console.error("handleMessageReceived recieved malformed data.")
         return;
@@ -184,8 +192,13 @@ export function actionRegisterPlayer(name) {
     });
 }
 
-export function actionPlayCard(cardEnum) {
-    console.log("actionPlayCard:",cardEnum);
+export function actionPlayCard(card) {
+
+    // const payload ={ 
+    //     "cardEnum" : cardEnum 
+    // };
+
+    console.log("actionPlayCard:",card);
 
     if(!client.connected) {
         onWsClosed();
@@ -193,7 +206,7 @@ export function actionPlayCard(cardEnum) {
     }    
     client.publish({
         destination: "/app/playCard",
-        cardEnum : cardEnum
+        body : card
     });
 }
 
@@ -209,8 +222,8 @@ export function actionDrawCard() {
     });
 }
 
-export function actionSelectSuit(suit) {
-    console.log("actionSelectSuit",suit);
+export function actionSelectSuit(card) {
+    console.log("actionSelectSuit",card);
 
     if(!client.connected) {
         onWsClosed();
@@ -218,7 +231,7 @@ export function actionSelectSuit(suit) {
     }    
     client.publish({
         destination: "/app/suitSelected",
-        card : suit
+        body : card
     });
 }
 

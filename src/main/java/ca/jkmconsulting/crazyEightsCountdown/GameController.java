@@ -48,6 +48,7 @@ public class GameController implements DeckObserver {
 
     public void setupGame() {
         deck = new Deck();
+        deck.subscribeDeckpdates(this);
         round=0;
         pickupTwoPlayedCards=null;
         initTurnOrder();
@@ -81,7 +82,7 @@ public class GameController implements DeckObserver {
         pickupTwoPlayedCards=null;
         checkEndRoundConditions();
         int increment = isReverseTurnOrder ? -1 : 1;
-        while(currentPlayer.equals(players.get(idxTurnOrder)) || players.get(idxTurnOrder).isTurnSkipped()) {
+        while(players.size()!=1 && currentPlayer.equals(players.get(idxTurnOrder)) || players.get(idxTurnOrder).isTurnSkipped()) {
             Player p = players.get(idxTurnOrder);
 
             //Check if turn skipped
@@ -217,7 +218,7 @@ public class GameController implements DeckObserver {
     }
 
     public void actionPlayerPlayCard(Player player, Card card) throws CrazyEightsIllegalCardException, CrazyEightsInvalidPlayerException {
-
+        this.LOG.info("actionPlayerPlayCard: PlayerID '{}' sends action to play the '{}' card.",player.getPlayerID(),card);
         if(!players.contains(player)) {
             this.LOG.error("Player '{}' attempted to play but is not part of the game!");
             throw new CrazyEightsInvalidPlayerException(String.format("Player %s attempted to play but is not part of the game!",player.getPlayerID()));
@@ -227,7 +228,7 @@ public class GameController implements DeckObserver {
             sendAlert(player,new AlertData(AlertTypes.BAD,"Play Card : Not Your Turn!","You cannot play a card unless it is your turn.",true));
             return;
         }
-        else if(player.hasCardInHand(card)) { //Case: Player doesn't have the card
+        else if(!player.hasCardInHand(card)) { //Case: Player doesn't have the card
             this.LOG.warn("Player '{}' attempted to play a '{}' which they do not have and was rejected.",player.getPlayerID(),card);
             sendAlert(player,new AlertData(AlertTypes.BAD,"Play Card : Card Not In Hand",String.format("You attempted to play %s but it's not in your hand. Choose a valid card.",card),true));
             return;
@@ -237,7 +238,7 @@ public class GameController implements DeckObserver {
             //Wild card select suit will guard against picking a suit that would make fulfillment impossible
             int numWild = player.getNumWildcards();
             int numNonWild = player.getHandSize()-numWild;
-            int numPlayableCurrentSuit = player.getPlayableCards(deck.getActiveSuit()).size();
+            int numPlayableCurrentSuit = player.getPlayableCards(deck.getActiveSuit(),deck.getActiveCardRank()).size();
 
             if(numPlayableCurrentSuit<PICKUP_TWO_INCREMENT || !(numWild > 0 && numNonWild>0) ) { //Player has not yet committed to playing 2 instead of drawing
                 this.LOG.warn("Player '{}' attempted to play cards instead of picking up, but does not have at least '{}' playable cards.",player.getPlayerID(),PICKUP_TWO_INCREMENT);
@@ -280,6 +281,7 @@ public class GameController implements DeckObserver {
     }
 
     public void actionDrawCard(Player player) throws CrazyEightsIllegalCardException, CrazyEightsInvalidPlayerException {
+        this.LOG.info("actionDrawCard: PlayerID '{}' sends action to draw card.",player.getPlayerID());
         int pickup = 1;
         if(!players.contains(player)) {
             this.LOG.error("Player '{}' attempted to play but is not part of the game!");
@@ -314,6 +316,7 @@ public class GameController implements DeckObserver {
 
     public void actionSelectSuit(Player player, Suit suit) throws CrazyEightsInvalidPlayerException {
         //If pickup 2 then they must choose a suit where they have at least one other playable cards
+        this.LOG.info("actionSelectSuit : PlayerID '{}' sends action to select suit '{}'",player.getPlayerID(),suit);
         if(!players.contains(player)) {
             this.LOG.error("Player '{}' attempted to select suit but is not part of the game!");
             throw new CrazyEightsInvalidPlayerException(String.format("Player %s attempted to play but is not part of the game!",player.getPlayerID()));
@@ -325,14 +328,14 @@ public class GameController implements DeckObserver {
         }
         else if(pickupTwoPlayedCards!=null && pickupTwoPlayedCards.size() < PICKUP_TWO_INCREMENT) {
             //Make sure player has enough to play with new suit.
-            ArrayList<Card> availableToPlay = player.getPlayableCards(suit);
+            ArrayList<Card> availableToPlay = player.getPlayableCards(suit,deck.getActiveCardRank());
             if(availableToPlay.size()<PICKUP_TWO_INCREMENT-pickupTwoPlayedCards.size()) {
                 String allowedSuits = "";
                 for(Suit s : Suit.values()) {
                     if(s==suit) {
                         continue;
                     }
-                    else if(player.getPlayableCards(s).size()>=PICKUP_TWO_INCREMENT-pickupTwoPlayedCards.size()) {
+                    else if(player.getPlayableCards(s,deck.getActiveCardRank()).size()>=PICKUP_TWO_INCREMENT-pickupTwoPlayedCards.size()) {
                         allowedSuits = allowedSuits+","+s;
                     }
                 }
@@ -359,7 +362,7 @@ public class GameController implements DeckObserver {
 
     private void handleWildCardPlayed() {
         sendGlobalMessage(null,String.format("%s played a wildcard and is picking a new suit.",currentPlayer.getName()));
-        message.convertAndSendToUser(currentPlayer.getSessionID(),"/queue/selectSuit","");
+        message.convertAndSendToUser(currentPlayer.getPlayerID(),"/queue/selectSuit","");
     }
 
     private void handleQueenPlayed() {
@@ -445,7 +448,7 @@ public class GameController implements DeckObserver {
 
     public void sendAlert(Player player, AlertData data) {
         this.LOG.info("PlayerID '{}' sent alert of type '{}' and message '{}'",player.getPlayerID(),data.type(),data.message());
-        message.convertAndSendToUser(player.getSessionID(),"/queue/alert",data);
+        message.convertAndSendToUser(player.getPlayerID(),"/queue/alert",data);
     }
 
     private void sendGlobalMessage(Player sender,String msg) {
