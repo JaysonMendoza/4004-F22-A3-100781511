@@ -21,6 +21,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Controller
@@ -29,6 +31,10 @@ public class PlayerManager implements PlayerHandObserver {
     private final ConcurrentHashMap<String,Player> playerIdToPlayer;
     @Autowired
     SimpMessagingTemplate message;
+
+    public Map<String, Player> getPlayerIdToPlayer() {
+        return new HashMap<>(playerIdToPlayer);
+    }
 
     @Autowired
     GameController game;

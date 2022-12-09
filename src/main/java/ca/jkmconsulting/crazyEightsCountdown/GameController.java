@@ -29,6 +29,8 @@ public class GameController implements DeckObserver {
     private boolean isReverseTurnOrder;
     private boolean isNextPlayerPickupTwo;
     private boolean isWaitingOnSuitSelection;
+    private boolean isTestMode;
+    private ArrayList<Card> testModeCardOrder;
     private Set<Card> pickupTwoPlayedCards;
     private Player currentPlayer;
     private final Deck deck = new Deck();
@@ -44,6 +46,8 @@ public class GameController implements DeckObserver {
         isNextPlayerPickupTwo =false;
         isWaitingOnSuitSelection=false;
         pickupTwoPlayedCards = null;
+        isTestMode = false;
+        testModeCardOrder=null;
     }
 
     public void setupGame(ArrayList<Card> cardOrder) {
@@ -54,6 +58,15 @@ public class GameController implements DeckObserver {
         isWaitingOnSuitSelection=false;
         initTurnOrder();
         startGame();
+    }
+
+    /**
+     * use After Construction before game starts
+     * @param cardOrder An array list with cards in order which they should be drawn from the top of the deck
+     */
+    public void activateTestMode(ArrayList<Card> cardOrder) {
+        isTestMode = true;
+        this.testModeCardOrder = cardOrder;
     }
 
     public Deck getDeck() {
@@ -92,10 +105,6 @@ public class GameController implements DeckObserver {
         return currentPlayer;
     }
 
-    public void setupGame() {
-        setupGame(null);
-    }
-
     public void startGame() {
         state = GameState.RUNNING;
 
@@ -118,6 +127,7 @@ public class GameController implements DeckObserver {
             p.setScore(0);
             p.setTurnSkipped(false);
         }
+        sendPlayerTurnOrderDataUpdate();
     }
 
     private void nextTurn() {
@@ -272,7 +282,7 @@ public class GameController implements DeckObserver {
         if(players.size() >= MAX_PLAYERS) {
             this.LOG.info("Max players reached, starting game...");
             state = GameState.RUNNING;
-            setupGame();
+            setupGame(testModeCardOrder);
         }
     }
 
@@ -500,9 +510,9 @@ public class GameController implements DeckObserver {
 
     private void dealStartingHand() {
         //Deal each player a new hand
-        for(Player p : players) {
-            for(int i=0;i<STARTING_HAND_SIZE;++i) {
-                p.addCard(deck.drawCard());
+        for(int i=0;i<STARTING_HAND_SIZE;++i) {
+            for(int j=0;j<players.size();++j) {
+                players.get(j).addCard(deck.drawCard());
             }
         }
     }
