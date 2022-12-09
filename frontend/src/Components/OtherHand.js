@@ -9,17 +9,18 @@ export default function OtherHand(props) {
         allCards.push(<PlayingCard cardEnum="CARDBACK"/>)
     }
     
-
+    let nameOthHandCardGroup = "otherHandCardGroup_"+props.playerID;
+    let nameOthHandName = "otherHandPlayerName_"+props.playerID;
     return (
         <Container>
             <Row>
                 <Col>
-                    <h3 style={{color : 'whitesmoke'}}>{props.name}</h3>
+                    <h3 name={nameOthHandName} style={{color : 'whitesmoke'}}>{props.playerName}</h3>
                 </Col>
             </Row>
             <Row>
                 <Col>
-                    <CardGroup>
+                    <CardGroup name={nameOthHandCardGroup}>
                         {allCards}
                     </CardGroup>
                 </Col>

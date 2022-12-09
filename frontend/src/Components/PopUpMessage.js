@@ -11,15 +11,15 @@ export default function PopUpMessage(props) {
 
     return (
         <>
-            <Modal id="popMsg" show={isVisible} centered size='lg'>
-                <Modal.Header id="popTitle"closeButton>
+            <Modal name="popMsg" show={isVisible} centered size='lg'>
+                <Modal.Header name="popTitle"closeButton>
                     <Modal.Title>{props.title}</Modal.Title>
                 </Modal.Header>
-                <Modal.Body id="popMessage">
+                <Modal.Body name="popMessage">
                     {props.message}
                 </Modal.Body>
                 <Modal.Footer>
-                    {props.closeButtonText ? <Button id="btnPopClose" onClick={closeButton}>{props.closeButtonText}</Button> : null}
+                    {props.closeButtonText ? <Button name="btnPopClose" onClick={closeButton}>{props.closeButtonText}</Button> : null}
                 </Modal.Footer>
             </Modal>
         </>

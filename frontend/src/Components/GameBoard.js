@@ -18,8 +18,9 @@ import SuitChooser from './SuitChooser';
     }
     console.log("Gameboard otherplha: ",otherPlayerHands);
     otherPlayerHands.forEach( (othPlayerUpdate,playerID) => {
+        let nameOthHand = "otherHand_"+playerID;
         console.log("GameBoard:: playerID:",playerID,", Data:",othPlayerUpdate);
-        otherPlayerViews.push(<div><OtherHand key={playerID} name={othPlayerUpdate.playerName} numCards={othPlayerUpdate.numCards}/></div>)
+        otherPlayerViews.push(<div><OtherHand playerID={playerID} playerName={othPlayerUpdate.playerName} name={nameOthHand} key={playerID} numCards={othPlayerUpdate.numCards}/></div>)
     });
 
     return (

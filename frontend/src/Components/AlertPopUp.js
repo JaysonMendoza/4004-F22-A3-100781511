@@ -40,15 +40,15 @@ export default function AlertPopUp(props) {
 
     return (
         <>
-            <Modal id="popAlert" show={isVisible} centered size='lg'>
-                <Modal.Header style={style} id="alertTitle"closeButton>
+            <Modal name="alertPop" show={isVisible} centered size='lg'>
+                <Modal.Header style={style} name="alertTitle"closeButton>
                     <Modal.Title>{title}</Modal.Title>
                 </Modal.Header>
-                <Modal.Body id="alertMessage">
+                <Modal.Body name="alertBody">
                     {message}
                 </Modal.Body>
                 <Modal.Footer>
-                    { isClosable ? <Button id="btnAlertClose" onClick={closeButton}>OK</Button> : null }
+                    { isClosable ? <Button name="alertBtnClose" onClick={closeButton}>OK</Button> : null }
                 </Modal.Footer>
             </Modal>
         </>

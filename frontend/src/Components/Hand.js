@@ -40,16 +40,16 @@ export default function Hand(props) {
         <Container>
             <Row>
                 <Col>
-                    <h2 style={{color : 'white'}}>{playerName}</h2>
+                    <h2 name='txtHandPlayerName' style={{color : 'white'}}>{playerName}</h2>
                 </Col>
                 <Col>
-                    {isPickingUpTwo ? <Button variant='danger' size='lg' onClick={redoTurn}>Redo Turn</Button> : null}
-                    {selectedCard ? <Button variant='info' size='lg' onClick={handlePlayCard}>Play Card</Button> : null}
+                    {isPickingUpTwo ? <Button name='btnRedoTurn' variant='danger' size='lg' onClick={redoTurn}>Redo Turn</Button> : null}
+                    {selectedCard ? <Button name='btnPlayCard' variant='info' size='lg' onClick={handlePlayCard}>Play Card</Button> : null}
                 </Col>
             </Row>
             <Row className="g-10">
                 <Col>
-                    <CardGroup>
+                    <CardGroup name="grpHandCards">
                         {allCards}
                     </CardGroup>
                 </Col>

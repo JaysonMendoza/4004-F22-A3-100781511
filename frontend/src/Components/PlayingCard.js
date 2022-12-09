@@ -25,7 +25,7 @@ export default function PlayingCard(props) {
     }
 
     return (
-        <Card id={props.cardEnum} className={props.className} onClick={handleClick} style={{backgroundColor : 'transparent',}}>
+        <Card name={props.cardEnum} className={props.className} onClick={handleClick} style={{backgroundColor : 'transparent',}}>
             <Card.Img style={wSize} src={cardImage} alt={cardImageAlt}/>
         </Card>
     );

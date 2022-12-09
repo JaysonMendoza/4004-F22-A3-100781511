@@ -22,10 +22,10 @@ function RegistrationForm(props) {
                     <Form onSubmit={handleSubmit}>
                         <Form.Group className="mb-3" controlId="formPlayerName">
                             <Form.Label>Enter Player Name:</Form.Label>
-                            <Form.Control type="text" placeholder="Enter Name" />
+                            <Form.Control name="formPlayerName" type="text" placeholder="Enter Name" />
                             <Form.Text className="text-muted">This is how you appear on the scoreboard and in messages</Form.Text>
                         </Form.Group>
-                        <Button id='btnRegister' variant="primary" type="submit">Register</Button>
+                        <Button name='btnRegister' variant="primary" type="submit">Register</Button>
                     </Form>
                 </Modal.Body>
             </Modal>
