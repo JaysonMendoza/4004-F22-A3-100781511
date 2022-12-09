@@ -255,28 +255,6 @@ public class GameController implements DeckObserver {
             sendAlert(player,new AlertData(AlertTypes.BAD,"Play Card : Card Not In Hand",String.format("You attempted to play %s but it's not in your hand. Choose a valid card.",card),true));
             return;
         }
-//        else if(pickupTwoPlayedCards!=null && pickupTwoPlayedCards.size()==0) { //CASE: Pickup two active and player doesn't have enough cards to play instead of pickup
-//            //We only check this once before they play to ensure they can fulfill two cards played with wilds in consideration.
-//            //Wild card select suit will guard against picking a suit that would make fulfillment impossible
-//            boolean canPlay = player.getPlayableCards(deck.getActiveSuit(),deck.getActiveCardRank()).size() >= PICKUP_TWO_INCREMENT;
-//
-//            if(!canPlay && player.getNumWildcards() > 0) {
-//                //If they have a wild card, we check all suits because they can switch to a valid one
-//                for(Suit s : Suit.values()) {
-//                    if(s!=deck.getActiveSuit()) {
-//                        canPlay = player.getPlayableCards(deck.getActiveSuit(),deck.getActiveCardRank()).size() >= PICKUP_TWO_INCREMENT;
-//                        if(canPlay) {
-//                            break; //If any suit is valid we can continue
-//                        }
-//                    }
-//                }
-//            }
-//            if(!canPlay ) { //Player has not yet committed to playing 2 instead of drawing
-//                this.LOG.warn("Player '{}' attempted to play cards instead of picking up, but does not have at least '{}' playable cards.",player.getPlayerID(),PICKUP_TWO_INCREMENT);
-//                sendAlert(player,new AlertData(AlertTypes.BAD,"Play Card : Not Enough Playable Cards for pickup 2",String.format("You must have at least %d cards to play in order to avoid picking up. You do not have any combination that would let you satisfy this. You must pickup %d cards.",PICKUP_TWO_INCREMENT,PICKUP_TWO_INCREMENT),true));
-//                return;
-//            }
-//        }
 
         if(!deck.discardCard(card)) {
             this.LOG.warn("Player '{}' attempted to play an invalid card '{}'.",player.getPlayerID(),card);
@@ -337,6 +315,7 @@ public class GameController implements DeckObserver {
 
         for(int i=0;i<pickup;++i) {
             Card c = deck.drawCard();
+            sendIndividualMessage(null,currentPlayer,String.format("You draw a %s",c));
             if(c == null) {
                 break;
             }
@@ -367,24 +346,6 @@ public class GameController implements DeckObserver {
             sendAlert(player,new AlertData(AlertTypes.BAD,"Select Suit : Not Active!","You need to play a wildcard before you select a suit.",true));
             return;
         }
-//        else if(pickupTwoPlayedCards!=null && pickupTwoPlayedCards.size() < PICKUP_TWO_INCREMENT) {
-//            //Make sure player has enough to play with new suit.
-//            int cardsToPlay = PICKUP_TWO_INCREMENT-pickupTwoPlayedCards.size();
-//            boolean canPlayWithChosen = player.getPlayableCards(suit,deck.getActiveCardRank()).size()>=cardsToPlay;
-//            if(!canPlayWithChosen && player.getNumWildcards()>0) {
-//                String allowedSuits = "";
-//                for(Suit s : Suit.values()) {
-//                    if(s != suit && player.getPlayableCards(s,deck.getActiveCardRank()).size()>=cardsToPlay) {
-//                        allowedSuits = allowedSuits+","+s;
-//                    }
-//                }
-//                allowedSuits = allowedSuits.substring(1);
-//                this.LOG.warn(String.format("PlayerID %s attempted to change suit to %s but doesn't have enough cards of that suit to fulfill the pickup 2 conditions. They must choose from %s",player.getPlayerID(),suit,allowedSuits));
-//                sendAlert(player,new AlertData(AlertTypes.BAD,"Select Suit : Invalid Choice - Pickup Two",String.format("You cannot choose the suit %s because doing so will leave you unable to fufill your pickup 2 requirement. Choose from %s",suit,allowedSuits),true));
-//                handleWildCardPlayed();
-//                return;
-//            }
-//        }
 
         deck.setActiveSuit(suit);
         isWaitingOnSuitSelection=false;
@@ -446,33 +407,9 @@ public class GameController implements DeckObserver {
             currentPlayer.addCard(c);
         }
         pickupTwoPlayedCards.clear();
-
+        sendIndividualMessage(null,currentPlayer,"You redo your turn!");
         sendAlert(currentPlayer,new AlertData(AlertTypes.NEUTRAL,"Redo Turn : Pickup Two","Your turn has been undone. Please try again.",true));
     }
-
-//    public void actionPlayCardPickupTwo(Player player,ArrayList<Card> cards) {
-//        ArrayList<Card> wilds = new ArrayList<>();
-//        ArrayList<Card> validCards = player.getPlayableCards(deck.getActiveSuit(),deck.getActiveCardRank());
-//        wilds.containsAll()
-//        for(Card c : cards) {
-//            if(c.isWildCard()) {
-//                wilds.add(c);
-//            }
-//        }
-//        if(wilds.size()<1) {
-//            if()
-//        }
-//        if(wilds.size() >= 2) {
-//            //Play both but only ask for suit once
-//        }
-//        else if(wilds.size()==1) {
-//            //Play  other card first if possible, then play wild.  Otherwise, play wild first and switch suit so they can play
-//
-//        }
-//        else if()
-//        //Check if one is a wild card
-//
-//    }
 
     private void handleWildCardPlayed() {
         if(currentPlayer.getHandSize()<1) {
@@ -596,6 +533,11 @@ public class GameController implements DeckObserver {
     private void sendGlobalMessage(Player sender,String msg) {
         String senderName = sender==null ? "GAME" : sender.getName().toUpperCase(Locale.ROOT);
         message.convertAndSend("/topic/messageReceived",new MessageData(senderName,msg));
+    }
+
+    private void sendIndividualMessage(Player sender,Player receiver,String msg) {
+        String senderName = sender==null ? "GAME" : sender.getName().toUpperCase(Locale.ROOT);
+        message.convertAndSendToUser(receiver.getPlayerID(),"/queue/messageReceived",new MessageData(senderName,msg));
     }
 
 }
