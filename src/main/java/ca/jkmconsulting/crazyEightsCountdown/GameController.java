@@ -30,6 +30,7 @@ public class GameController implements DeckObserver {
     private boolean isNextPlayerPickupTwo;
     private boolean isWaitingOnSuitSelection;
     private boolean isTestMode;
+    private int cardsDrawnInTurn = 0;
     private ArrayList<Card> testModeCardOrder;
     private Set<Card> pickupTwoPlayedCards;
     private Player currentPlayer;
@@ -133,6 +134,7 @@ public class GameController implements DeckObserver {
     private void nextTurn() {
         pickupTwoPlayedCards=null;
         isWaitingOnSuitSelection=false;
+        cardsDrawnInTurn = 0;
         deck.clearUndoPoint();
         if(state != GameState.RUNNING) {
             this.LOG.error("Game is in invalid state. Should be '{}' but is instead '{}'.",GameState.RUNNING,state);
@@ -355,14 +357,16 @@ public class GameController implements DeckObserver {
             sendAlert(player,new AlertData(AlertTypes.BAD,"Draw Card : Pickup Two - Cannot Draw","You have chosen to play cards for the pickup two event and cannot draw. If you would like to draw instead, please select the 'REDO TURN' button.",true));
 
         }
-        else if(pickupTwoPlayedCards!=null)
+        else if(state==GameState.PICKUP_TWO_ACTIVE)
         {
             pickup = PICKUP_TWO_INCREMENT;
+            cardsDrawnInTurn = cardsDrawnInTurn - PICKUP_TWO_INCREMENT;
         }
 
         for(int i=0;i<pickup;++i) {
             Card c = deck.drawCard();
             sendIndividualMessage(null,currentPlayer,String.format("You draw a %s",c));
+            ++cardsDrawnInTurn;
             if(c == null) {
                 break;
             }
@@ -373,7 +377,9 @@ public class GameController implements DeckObserver {
         }
         sendGlobalMessage(player,String.format("%s draws %d cards!",player.getName(),pickup));
         checkIfPickupTwoEventCompleted(true);
-        nextTurn();
+        if(cardsDrawnInTurn >= 3) {
+            nextTurn();
+        }
     }
 
     public void actionSelectSuit(Player player, Suit suit) throws CrazyEightsInvalidPlayerException {
