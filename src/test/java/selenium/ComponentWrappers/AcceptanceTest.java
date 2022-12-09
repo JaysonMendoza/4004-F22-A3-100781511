@@ -1,24 +1,20 @@
-package cucumber;
+package selenium.ComponentWrappers;
 
 
 import ca.jkmconsulting.crazyEightsCountdown.*;
 import ca.jkmconsulting.crazyEightsCountdown.Enums.Card;
 import ca.jkmconsulting.crazyEightsCountdown.Enums.GameState;
 import io.github.bonigarcia.wdm.WebDriverManager;
-import org.apache.commons.lang3.ThreadUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Point;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import selenium.AbstractSeleniumTest;
-import selenium.ComponentWrappers.*;
 
 import java.time.Duration;
 import java.util.ArrayList;
