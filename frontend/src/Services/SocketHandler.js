@@ -120,6 +120,7 @@ function handlePlayerUpdated(response) {
 
     if(usePlayerStore.getState().playerID===null) {
         usePlayerStore.getState().setPlayerID(data.playerID);
+        usePlayerStore.getState().setPlayerName(data.playerName);
     }
     else if(data.playerID!==usePlayerStore.getState().playerID) {
         console.error("Update recieved for invalid player. Player "+usePlayerStore.getState().playerID+" cannot be updated with playerID "+response.playerID);
@@ -169,7 +170,8 @@ function handleOtherPlayerUpdated(response) {
         console.error("handleMessageReceived recieved malformed data.")
         return;
     }
-    useGameBoardStore.getState().updateOthPlayerHand(data.playerID,data.numCards);
+    console.log("handleOtherPlayerUpdated:; playerID: ",data.playerID,", Hand:",data);
+    useGameBoardStore.getState().updateOthPlayerHand(data);
 }
 
 function handleMessageReceived(response) {

@@ -16,14 +16,16 @@ import SuitChooser from './SuitChooser';
     if(isSelectingSuit) {
         suitChooserViewport = <SuitChooser/>
     }
-    for(const p of otherPlayerHands) {
-        otherPlayerViews.push(<div><OtherHand name={p.playerName} numCards={p.numCards}/></div>)
-    }
+    console.log("Gameboard otherplha: ",otherPlayerHands);
+    otherPlayerHands.forEach( (othPlayerUpdate,playerID) => {
+        console.log("GameBoard:: playerID:",playerID,", Data:",othPlayerUpdate);
+        otherPlayerViews.push(<div><OtherHand key={playerID} name={othPlayerUpdate.playerName} numCards={othPlayerUpdate.numCards}/></div>)
+    });
 
     return (
         <Container>
             <Row>
-                <Stack gap={1}  style={{height : '30vh'}}>
+                <Stack style={{height : '30vh'}}>
                     {otherPlayerViews}
                 </Stack>
             </Row>

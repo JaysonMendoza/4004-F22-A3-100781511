@@ -92,16 +92,15 @@ public class PlayerManager implements PlayerHandObserver {
 
     @Override
     synchronized public void handlePlayerHandUpdate(Player player,PlayerUpdate updatePlayer, OtherPlayerHandUpdate updateOther) {
-        final String stompEndpoint = "/queue/playerUpdated";
         this.LOG.info("Dispatch: updatePlayer from playerID '{}' received and sent to all players.", player.getPlayerID());
         for(Player p: playerIdToPlayer.values()) {
             if(player==p) {
-                this.LOG.info("Updated player '{}' sent to endpoint '{}' with '{}' cards",p.getPlayerID(),stompEndpoint,updatePlayer.cards().size());
-                message.convertAndSendToUser(p.getPlayerID(),stompEndpoint,updatePlayer);
+                this.LOG.info("Updated player '{}' sent to endpoint '{}' with '{}' cards",p.getPlayerID(),"/queue/playerUpdated",updatePlayer.cards().size());
+                message.convertAndSendToUser(p.getPlayerID(),"/queue/playerUpdated",updatePlayer);
             }
             else {
-                this.LOG.info("Updated player '{}' sent to endpoint '{}' '{}' cards",p.getPlayerID(),stompEndpoint,updateOther.numCards());
-                message.convertAndSendToUser(p.getPlayerID(),stompEndpoint,updateOther);
+                this.LOG.info("Updated player '{}' sent to endpoint '{}' '{}' cards",p.getPlayerID(),"/queue/OtherPlayerUpdated",updateOther.numCards());
+                message.convertAndSendToUser(p.getPlayerID(),"/queue/OtherPlayerUpdated",updateOther);
             }
         }
     }

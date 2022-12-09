@@ -1,8 +1,9 @@
 import React from 'react';
 import { ListGroup, ListGroupItem, Badge, Container, Row,Col } from 'react-bootstrap';
-import { useTurnOrder } from '../Services/Stores';
+import { useTurnOrder, usePlayerStore } from '../Services/Stores';
 export default function ScoreBoard(props) {
     const [turnOrder,isPlayReversed, round] = useTurnOrder((state) => [state.scores,state.isPlayReversed,state.round]);
+    const [playerName] = usePlayerStore( (state) => [state.name]);
     let listView = [];
     for(const record of turnOrder) {
         listView.push(createListItem(record));
@@ -26,6 +27,9 @@ export default function ScoreBoard(props) {
     return (
         <Container>
             <Row>
+                <Col>
+                    <h5 style={{color : 'whitesmoke'}}>Player: {playerName}</h5>
+                </Col>
                 <Col>
                     <h5 style={{color : 'whitesmoke'}}>Round: {round}</h5>
                 </Col>

@@ -14,7 +14,7 @@ export default function PlayingCard(props) {
         wSize = {width:'8vh'};
     }
     else {
-        wSize = {width : '6vh'};
+        wSize = {width : '3vh'};
     }
 
     function handleClick(event) {

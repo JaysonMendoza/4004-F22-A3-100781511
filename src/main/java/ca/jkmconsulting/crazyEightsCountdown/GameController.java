@@ -17,7 +17,7 @@ import java.util.*;
 @Controller
 public class GameController implements DeckObserver {
     public final int PICKUP_TWO_INCREMENT = 2;
-    public final int MAX_PLAYERS = 1;
+    public final int MAX_PLAYERS = 4;
     public final int END_CONDITION_SCORE_THRESHOLD =100;
     public final int STARTING_HAND_SIZE = 5;
     private GameState state;
@@ -475,6 +475,9 @@ public class GameController implements DeckObserver {
 //    }
 
     private void handleWildCardPlayed() {
+        if(currentPlayer.getHandSize()<1) {
+            return;
+        }
         isWaitingOnSuitSelection=true;
         sendGlobalMessage(null,String.format("%s played a wildcard and is picking a new suit.",currentPlayer.getName()));
         message.convertAndSendToUser(currentPlayer.getPlayerID(),"/queue/selectSuit","");

@@ -62,12 +62,13 @@ export const usePlayerStore = create( (set) => ({
 //         numCards : 3
 //     }
 // ];
-//TODO: Need to fix other player hands because this implementation doesn't work
 export const useGameBoardStore = create( (set) => ({
     numDrawPileCards : 0,
-    otherPlayerHands : [],
+    otherPlayerHands : new Map(),
     discardPile: [],
-    updateOthPlayerHand: (playerID,numCards) => set( (state) =>state.otherPlayerHands.set(playerID,numCards) ),
+    updateOthPlayerHand: (otherPlayerUpdate) => set( (state) => ({
+        otherPlayerHands : new Map(state.otherPlayerHands).set(otherPlayerUpdate.playerID,otherPlayerUpdate)
+    })),
     updateDiscardPile : (newDiscardPile) => set({discardPile : newDiscardPile}),
     updateNumDrawPile : (numCards) => set( {numDrawPileCards : numCards} )
 }))
