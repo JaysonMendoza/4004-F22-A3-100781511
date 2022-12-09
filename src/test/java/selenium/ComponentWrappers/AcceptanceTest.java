@@ -2,6 +2,7 @@ package selenium.ComponentWrappers;
 
 
 import ca.jkmconsulting.crazyEightsCountdown.*;
+import ca.jkmconsulting.crazyEightsCountdown.Enums.AlertTypes;
 import ca.jkmconsulting.crazyEightsCountdown.Enums.Card;
 import ca.jkmconsulting.crazyEightsCountdown.Enums.GameState;
 import io.github.bonigarcia.wdm.WebDriverManager;
@@ -132,4 +133,107 @@ public class AcceptanceTest extends AbstractSeleniumTest {
         WebElement eleCurrentPlayerName = waitElementDisplayed(PlayerHand.byH5CurrentTurnPlayer,0);
         assertTrue(  eleCurrentPlayerName.getText().contains(players.get(3).getName()));
     }
+
+    @Test
+    public void A44() throws InterruptedException {
+        ArrayList<Card> cardList = new ArrayList<>();
+        cardList.add(Card.CLUBS_QUEEN);
+        // P1 -> QC
+        setupGame(cardList);
+        waitAndClickElement(PlayerHand.byCardEnum(Card.CLUBS_QUEEN),0);
+        waitAndClickElement(PlayerHand.byBtnPlayCard,0);
+
+        //This will cause alert for skipped player to clear
+        assertTrue(waitElementDisplayed(AlertPopUp.byTxtTitle,1).getText().contains("Turn Skipped"));
+        waitAndClickElement(AlertPopUp.byBtnAlertClose,1);
+        WebElement eleCurrentPlayerName = waitElementDisplayed(PlayerHand.byH5CurrentTurnPlayer,0);
+        assertTrue(  eleCurrentPlayerName.getText().contains(players.get(2).getName()));
+
+    }
+
+    @Test
+    public void A45() throws InterruptedException {
+        ArrayList<Card> cardList = new ArrayList<>();
+        //Card play sequence to start from p4
+        cardList.add(Card.HEARTS_5); //P1
+        cardList.add(Card.HEARTS_4); //P2
+        cardList.add(Card.HEARTS_3); //P3
+        cardList.add(Card.CLUBS_3); //P4
+        setupGame(cardList);
+
+        //Run Turns 1 to 4
+        for(int i=0;i<cardList.size();++i) {
+            waitAndClickElement(PlayerHand.byCardEnum(cardList.get(i)),i);
+            waitAndClickElement(PlayerHand.byBtnPlayCard,i);
+        }
+
+        WebElement eleCurrentPlayerName = waitElementDisplayed(PlayerHand.byH5CurrentTurnPlayer,0);
+        assertTrue(eleCurrentPlayerName.getText().contains(players.get(0).getName()));
+    }
+
+    @Test
+    public void A47() throws InterruptedException {
+        ArrayList<Card> cardList = new ArrayList<>();
+        // P4 -> 1H
+        // P3 -> 7H
+        //Card play sequence to start from p4
+        cardList.add(Card.HEARTS_5); //P1
+        cardList.add(Card.HEARTS_4); //P2
+        cardList.add(Card.HEARTS_3); //P3
+        cardList.add(Card.HEARTS_ACE); //P4
+        cardList.add(Card.SPADES_3); // P1 Not to be played
+        cardList.add(Card.SPADES_7); // P2 Not to be played
+        cardList.add(Card.HEARTS_7); //P3
+        setupGame(cardList);
+
+        //Verify direction is normal
+        assertTrue(waitElementDisplayed(ScoreBoard.byH5DirectionOfPlay,0).getText().contains(ScoreBoard.PLAY_DIRECTION.Normal.toString()));
+        //Run Turns 1 to 4 so P4 is current
+        for(int i=0;i<4;++i) {
+            waitAndClickElement(PlayerHand.byCardEnum(cardList.get(i)),i);
+            waitAndClickElement(PlayerHand.byBtnPlayCard,i);
+        }
+
+        //verify direction is reversed
+        assertTrue(waitElementDisplayed(ScoreBoard.byH5DirectionOfPlay,0).getText().contains(ScoreBoard.PLAY_DIRECTION.Reversed.toString()));
+
+        //Ensure player 3 is current player
+        WebElement eleCurrentPlayerName = waitElementDisplayed(PlayerHand.byH5CurrentTurnPlayer,0);
+        assertTrue(eleCurrentPlayerName.getText().contains(players.get(2).getName()));
+
+        //Player 3 plays 7 card
+        waitAndClickElement(PlayerHand.byCardEnum(Card.HEARTS_7),2);
+        waitAndClickElement(PlayerHand.byBtnPlayCard,2);
+
+        //Verify its player 2's turn
+        eleCurrentPlayerName = waitElementDisplayed(PlayerHand.byH5CurrentTurnPlayer,1);
+        assertTrue(eleCurrentPlayerName.getText().contains(players.get(1).getName()));
+
+    }
+
+    @Test
+    public void A48() throws InterruptedException {
+        ArrayList<Card> cardList = new ArrayList<>();
+        //Card play sequence to start from p4
+        cardList.add(Card.CLUBS_3); //P1
+        cardList.add(Card.CLUBS_4); //P2
+        cardList.add(Card.CLUBS_5); //P3
+        cardList.add(Card.CLUBS_QUEEN); //P4
+        setupGame(cardList);
+
+        //Run Turns 1 to 4
+        for(int i=0;i<cardList.size();++i) {
+            waitAndClickElement(PlayerHand.byCardEnum(cardList.get(i)),i);
+            waitAndClickElement(PlayerHand.byBtnPlayCard,i);
+        }
+
+        //This will cause alert for skipped player 1 to clear
+        assertTrue(waitElementDisplayed(AlertPopUp.byTxtTitle,0).getText().contains("Turn Skipped"));
+        waitAndClickElement(AlertPopUp.byBtnAlertClose,0);
+
+        //Verify that it's player2's turn
+        WebElement eleCurrentPlayerName = waitElementDisplayed(PlayerHand.byH5CurrentTurnPlayer,1);
+        assertTrue(  eleCurrentPlayerName.getText().contains(players.get(1).getName()));
+    }
+
 }
