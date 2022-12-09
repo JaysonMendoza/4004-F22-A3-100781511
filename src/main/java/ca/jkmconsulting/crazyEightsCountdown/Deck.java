@@ -17,6 +17,9 @@ public class Deck {
     private final HashSet<DeckObserver> observers;
     private Suit activeSuit;
     private CardRank activeCardRank;
+    private boolean undoPointSaved;
+    private Suit undoSuit;
+    private Card undoCard;
 
 
     public Deck(ArrayList<Card> fixedOrder) {
@@ -24,6 +27,9 @@ public class Deck {
         cardsIssued = new ArrayList<>();
         discardPile = new Stack<>();
         observers = new HashSet<>();
+        undoCard = null;
+        undoSuit = null;
+        undoPointSaved = false;
         buildDeck(fixedOrder);
         this.LOG.info("Deck created.");
         activeSuit=null;
@@ -46,12 +52,15 @@ public class Deck {
     }
 
     public void setActiveSuit(Suit newActiveSuit) {
+        this.LOG.info("Active suit set to '{}'",newActiveSuit);
+
         activeSuit = newActiveSuit;
     }
-    private void buildDeck(ArrayList<Card> cardOrder) {
+    public void buildDeck(ArrayList<Card> cardOrder) {
         drawDeck.clear();
         discardPile.clear();
         cardsIssued.clear();
+        clearUndoPoint();
         activeSuit=null;
         ArrayList<Card> allCards = new ArrayList<>(Arrays.asList(Card.values()));
         Collections.shuffle(allCards);
@@ -76,6 +85,45 @@ public class Deck {
 
     public int getNumCardsInDeck() {
         return drawDeck.size();
+    }
+
+    public void captureUndoPoint() {
+        undoCard = discardPile.peek();
+        undoSuit = activeSuit;
+        undoPointSaved = true;
+        this.LOG.info("Undo Point captured with suit '{}' and card '{}'",undoSuit,undoCard);
+    }
+
+    public ArrayList<Card> restoreToUndoPoint() {
+        if(!undoPointSaved) {
+            this.LOG.error("Undo Point cannot be restored because it has yet to be saved! undoSuit '{}' and undoCard '{}'",undoSuit,undoCard);
+            return null;
+        }
+        else if( discardPile.size()< 1 || (undoCard!=null && !discardPile.contains(undoCard)) ) {
+            this.LOG.warn("Deck undo point could not be restored because the card no longer exists in the discardPile. Perhaps there was a new round?");
+            clearUndoPoint();
+            return null;
+        }
+
+        ArrayList<Card> cardsRemoved = new ArrayList<>();
+        while(discardPile.size() > 0 && discardPile.peek()!=undoCard ) {
+            Card c = discardPile.pop();
+            cardsRemoved.add(c);
+            cardsIssued.add(c);
+            this.LOG.info("Undo Point CARD UNDONE '{}'",c);
+        }
+        activeSuit = undoSuit;
+        Collections.reverse(cardsRemoved); //Make sure the first card in the array is first card played so controller can replay turn
+        this.LOG.info("Undo Point RESTORED with suit '{}' and card '{}'",undoSuit,undoCard);
+        notifyDeckUpdated();
+        return cardsRemoved;
+    }
+
+    public void clearUndoPoint() {
+        undoSuit = null;
+        undoCard = null;
+        undoPointSaved=false;
+        this.LOG.info("Undo Point CLEARED.");
     }
 
     public Card drawCard() {

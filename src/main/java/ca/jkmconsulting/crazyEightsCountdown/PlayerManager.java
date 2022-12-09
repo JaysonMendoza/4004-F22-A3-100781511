@@ -6,6 +6,7 @@ import ca.jkmconsulting.crazyEightsCountdown.Enums.Suit;
 import ca.jkmconsulting.crazyEightsCountdown.Exceptions.CrazyEightsIllegalCardException;
 import ca.jkmconsulting.crazyEightsCountdown.Exceptions.CrazyEightsInvalidPlayerException;
 import ca.jkmconsulting.crazyEightsCountdown.Exceptions.CrazyEightsJoinFailureException;
+import ca.jkmconsulting.crazyEightsCountdown.Exceptions.CrazyEightsPickupTwoUnexpectedStateException;
 import ca.jkmconsulting.crazyEightsCountdown.PayloadDataTypes.AlertData;
 import ca.jkmconsulting.crazyEightsCountdown.PayloadDataTypes.OtherPlayerHandUpdate;
 import ca.jkmconsulting.crazyEightsCountdown.PayloadDataTypes.PlayerUpdate;
@@ -79,6 +80,14 @@ public class PlayerManager implements PlayerHandObserver {
         LOG.info("handleActionSuitSelected invoked by playerID '{}' for cardEnum '{}'.",p.getPlayerID(),card);
 
         game.actionSelectSuit(p,card.suit);
+    }
+
+    @MessageMapping("/actionRedoTurn")
+    synchronized public void handleActionSuitSelected(Principal principal) throws CrazyEightsInvalidPlayerException, CrazyEightsPickupTwoUnexpectedStateException {
+        Player p = this.playerIdToPlayer.get(principal.getName());
+        LOG.info("handleActionSuitSelected invoked by playerID '{}'.",p.getPlayerID());
+
+        game.actionRedoTurn(p);
     }
 
     @Override

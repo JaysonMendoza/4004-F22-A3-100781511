@@ -173,12 +173,6 @@ public class Player {
         cards.addAll(cardsByRank.getOrDefault(cardRank,new ArrayList<>()));
         cards.addAll(wildCards);
         return new ArrayList<>(cards);
-//        for(Card c : wildCards) {
-//            if(!playableCards.contains(c)) {
-//                playableCards.add(c);
-//            }
-//        }
-//        return playableCards;
     }
 
     public boolean subscribeHandUpdates(PlayerHandObserver subscriber) {
