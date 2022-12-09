@@ -39,7 +39,6 @@ public abstract class AbstractSeleniumTest {
 
     public void disconnectUsers() {
         for(WebDriver wd : userInstances) {
-            wd.close();
             wd.quit();
         }
     }

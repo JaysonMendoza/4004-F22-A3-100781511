@@ -55,6 +55,43 @@ public class GameController implements DeckObserver {
         initTurnOrder();
         startGame();
     }
+
+    public Deck getDeck() {
+        return deck;
+    }
+
+    public GameState getState() {
+        return state;
+    }
+
+    public ArrayList<Player> getPlayers() {
+        return new ArrayList<>(players);
+    }
+
+    public HashMap<String, Player> getPlayerIdToPlayer() {
+        return new HashMap<>(playerIdToPlayer);
+    }
+
+    public int getRound() {
+        return round;
+    }
+
+    public boolean isReverseTurnOrder() {
+        return isReverseTurnOrder;
+    }
+
+    public boolean isNextPlayerPickupTwo() {
+        return isNextPlayerPickupTwo;
+    }
+
+    public boolean isWaitingOnSuitSelection() {
+        return isWaitingOnSuitSelection;
+    }
+
+    public Player getCurrentPlayer() {
+        return currentPlayer;
+    }
+
     public void setupGame() {
         setupGame(null);
     }
