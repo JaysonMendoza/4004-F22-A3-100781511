@@ -1,4 +1,7 @@
 # Getting Started with Create React App
+DefaultSubscriptionRegistry@6146
+DefaultSubscriptionRegistry$SessionInfo@6136
+DefaultSubscriptionRegistry$DestinationCache@6149
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 

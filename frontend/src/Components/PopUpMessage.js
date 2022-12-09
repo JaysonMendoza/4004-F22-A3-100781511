@@ -1,6 +1,5 @@
 import React, {useState} from 'react'
-import { Modal, Image, Button } from 'react-bootstrap';
-import {Cards} from './Cards';
+import { Modal, Button } from 'react-bootstrap';
 
 export default function PopUpMessage(props) {
     const [isVisible,setVisible] = useState(props.show ? props.show : false);

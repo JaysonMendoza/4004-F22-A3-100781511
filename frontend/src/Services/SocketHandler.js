@@ -47,8 +47,10 @@ function onWsConnected(frame) {
     client.subscribe("/user/queue/OtherPlayerUpdated",handleOtherPlayerUpdated); 
     client.subscribe("/user/queue/failedJoin",handleFailedJoin);
     client.subscribe("/user/queue/alert",handleAlert);
-    client.subscribe("/user/queue/gameEnded",handleGameEnded);
-    client.subscribe("/topic/askStartGame",handAskStartGame);    
+    client.subscribe("/topic/gameEnded",handleGameEnded);
+    client.subscribe("/topic/askStartGame",handAskStartGame); 
+    client.subscribe("/user/queue/pickUpTwoStart",handlePickUpTwoStart);
+    client.subscribe("/user/queue/pickUpTwoEnd",handlePickUpTwoEnd);
 }
 
 
@@ -66,7 +68,7 @@ function handleGameEnded(response) {
     useGameStateStore.getState().setIsGameStarted(false);
     useGameStateStore.getState().setIsRegistered(false);
     useGameStateStore.getState().setIsConnected(false);
-    handleAlert(response);
+    useGameStateStore.getState().setIsGameEnded(true);
     client.deactivate();
 }
 function handleFailedJoin(response) {
@@ -96,6 +98,16 @@ function handlePlayerRegistered(response) {
     }
     useGameStateStore.getState().setIsRegistered(true);
     // handlePlayerUpdated(response);
+}
+
+function handlePickUpTwoStart(response) {
+    console.log("handlePickUpTwoStart");
+    usePlayerStore.getState().setIsPickingUpTwo(true);
+}
+
+function handlePickUpTwoEnd(response) {
+    console.log("handlePickUpTwoEnd");
+    usePlayerStore.getState().setIsPickingUpTwo(false);
 }
 
 function handlePlayerUpdated(response) {
@@ -232,6 +244,13 @@ export function actionSelectSuit(card) {
     client.publish({
         destination: "/app/suitSelected",
         body : card
+    });
+}
+
+export function actionRedoTurn() {
+    console.log("actionRedoTurn");
+    client.publish({
+        destination: "/app/actionRedoTurn"
     });
 }
 

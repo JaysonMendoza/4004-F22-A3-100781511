@@ -7,18 +7,15 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { useGameStateStore } from './Services/Stores';
 
 import background from './Assets/green_background.png';
-import Hand from './Components/Hand';
-import OtherHand from './Components/OtherHand';
-import DeckArea from './Components/DeckArea';
 import HeadsUpDisplay from './Components/HeadsUpDisplay';
 import AlertPopUp from './Components/AlertPopUp';
 
 function App() {
-  const [isGameStarted,isRegistered,isConnected] = useGameStateStore((state) => [state.isGameStarted,state.isRegistered,state.isConnected]);
+  const [isGameStarted,isRegistered,isConnected,isGameEnded] = useGameStateStore((state) => [state.isGameStarted,state.isRegistered,state.isConnected,state.isGameEnded]);
   
   let viewport;
 
-  if(!isConnected) {
+  if(!isConnected && !isGameEnded) {
     //Lost Connection
     viewport = <PopUpMessage show={true} title="Lost Connection" message="Game has lost connection! Attempting to reconnect..."/>;
   }
@@ -29,7 +26,7 @@ function App() {
   else if(isRegistered) {
     viewport = <PopUpMessage show={true} title="Waiting for Game Start" message="Please wait for all players to connect and game to begin!"/>;
   }
-  else {
+  else if(!isGameEnded) {
     viewport = <RegistrationForm/>;
     // viewport = <PlayingCard onClick={(e) => console.log("cardClick",e)} cardEnum="CLUBS_JACK" isSelected={false}/> .
     // viewport = <GameBoard/>

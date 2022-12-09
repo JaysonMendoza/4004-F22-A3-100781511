@@ -1,5 +1,5 @@
 import React from 'react'
-import {Form,Button,Modal,Container} from 'react-bootstrap'
+import {Form,Button,Modal} from 'react-bootstrap'
 import {actionRegisterPlayer} from '../Services/SocketHandler'
 import {useGameStateStore} from '../Services/Stores'
 

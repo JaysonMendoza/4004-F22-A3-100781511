@@ -1,11 +1,11 @@
 import React, {useState} from 'react'
-import { CardGroup , Container, Row, Col, Button, CardDeck} from 'react-bootstrap'
+import { CardGroup , Container, Row, Col, Button} from 'react-bootstrap'
 import { usePlayerStore } from '../Services/Stores'
 import PlayingCard from './PlayingCard'
-import { actionPlayCard } from '../Services/SocketHandler'
+import { actionPlayCard, actionRedoTurn } from '../Services/SocketHandler'
 
 export default function Hand(props) {
-    const [hand,playerName] = usePlayerStore((state) => [state.cards,state.name]);
+    const [hand,playerName,isPickingUpTwo] = usePlayerStore((state) => [state.cards,state.name,state.isPickingUpTwo]);
     const [selectedCard,setSelectedCard] = useState(null);
     
     let allCards = [];
@@ -23,6 +23,19 @@ export default function Hand(props) {
         }
     }
 
+    function redoTurn(event) {
+        console.log("Redo Turn Clicked");
+        setSelectedCard(null);
+        actionRedoTurn();
+    }
+
+    function handlePlayCard(event) {
+        actionPlayCard(selectedCard)
+        setSelectedCard(null);
+    }
+
+    console.log("Hand selected card:",selectedCard);
+
     return (
         <Container>
             <Row>
@@ -30,7 +43,8 @@ export default function Hand(props) {
                     <h2 style={{color : 'white'}}>{playerName}</h2>
                 </Col>
                 <Col>
-                    {selectedCard ? <Button onClick={(e) => actionPlayCard(selectedCard)}>Play Card</Button> : null}
+                    {isPickingUpTwo ? <Button variant='danger' size='lg' onClick={redoTurn}>Redo Turn</Button> : null}
+                    {selectedCard ? <Button variant='info' size='lg' onClick={handlePlayCard}>Play Card</Button> : null}
                 </Col>
             </Row>
             <Row className="g-10">

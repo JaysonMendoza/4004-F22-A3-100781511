@@ -1,6 +1,5 @@
 import React from 'react'
 import { CardGroup , Container, Row, Col} from 'react-bootstrap'
-import { Cards } from './Cards'
 import PlayingCard from './PlayingCard'
 
 export default function OtherHand(props) {
