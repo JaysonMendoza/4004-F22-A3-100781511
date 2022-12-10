@@ -56,13 +56,17 @@ public class Deck {
 
         activeSuit = newActiveSuit;
     }
-    public void buildDeck(ArrayList<Card> cardOrder) {
+    public void buildDeck(ArrayList<Card> cardOrder,HashSet<Card> exludeFromDeck) {
         drawDeck.clear();
         discardPile.clear();
         cardsIssued.clear();
         clearUndoPoint();
         activeSuit=null;
         ArrayList<Card> allCards = new ArrayList<>(Arrays.asList(Card.values()));
+        if(exludeFromDeck!=null) {
+            allCards.removeAll(exludeFromDeck);
+            cardsIssued.addAll(exludeFromDeck);
+        }
         Collections.shuffle(allCards);
 //        ArrayList<Card> order = cardOrder;
         //Add all cards to draw deck that are not included in stacked deck portion
@@ -81,6 +85,10 @@ public class Deck {
             drawDeck.addAll(allCards);
         }
         notifyDeckUpdated();
+    }
+
+    public void buildDeck(ArrayList<Card> cardOrder) {
+        buildDeck(cardOrder,null);
     }
 
     public int getNumCardsInDeck() {

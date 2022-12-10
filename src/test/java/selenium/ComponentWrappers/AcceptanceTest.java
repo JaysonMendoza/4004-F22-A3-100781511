@@ -19,6 +19,7 @@ import selenium.AbstractSeleniumTest;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Map;
 
 import static java.lang.Thread.sleep;
@@ -234,6 +235,55 @@ public class AcceptanceTest extends AbstractSeleniumTest {
         //Verify that it's player2's turn
         WebElement eleCurrentPlayerName = waitElementDisplayed(PlayerHand.byH5CurrentTurnPlayer,1);
         assertTrue(  eleCurrentPlayerName.getText().contains(players.get(1).getName()));
+    }
+
+    @Test
+    public void A67() throws InterruptedException {
+        setupGame(null);
+        ArrayList<Card> cardList = new ArrayList<>();
+        //Sequence of Play
+        //P1 -> 2C
+        //P2 -> Must draw because only has 4H (No clubs or 2), Draws 6C 9D, then plays 6C
+        ArrayList<Card> drawOrder = new ArrayList<>();
+        HashSet<Card> cardsToExcludeFromDeck = new HashSet<>();
+        drawOrder.add(Card.CLUBS_6); //P2
+        drawOrder.add(Card.DIAMONDS_9); //P2
+
+        //P1 Setup
+        ArrayList<Card> p1 = new ArrayList<>();
+        p1.add(Card.CLUBS_2);
+        p1.add(Card.CLUBS_4);
+        players.get(0).__fixHand(p1);
+        cardsToExcludeFromDeck.addAll(p1);
+
+        //P2 Setup
+        ArrayList<Card> p2 = new ArrayList<>();
+        p2.add(Card.HEARTS_4);
+        players.get(1).__fixHand(p2);
+        cardsToExcludeFromDeck.addAll(p2);
+
+        //Other Players Keep their hands
+        cardsToExcludeFromDeck.addAll(players.get(2).getHand());
+        cardsToExcludeFromDeck.addAll(players.get(3).getHand());
+
+        // Stack the deck with the cards not in players hands. Everything no specified in draw order is random
+        deck.buildDeck(drawOrder,cardsToExcludeFromDeck);
+
+
+        waitAndClickElement(PlayerHand.byCardEnum(Card.CLUBS_2),0);
+        waitAndClickElement(PlayerHand.byBtnPlayCard,0);
+
+        //Click on deck to draw 2 cards instead of play
+        assertEquals(1,players.get(1).getHandSize());
+        WebElement we = waitElementDisplayed(DeckArea.byBtnDrawCard,1);
+        waitAndClickElement(DeckArea.byBtnDrawCard,1);
+        sleep(Duration.ofSeconds(2).toMillis());
+        assertEquals(3,players.get(1).getHandSize());
+
+        // Play 6C
+        waitAndClickElement(PlayerHand.byCardEnum(Card.CLUBS_6),1);
+        waitAndClickElement(PlayerHand.byBtnPlayCard,1);
+
     }
 
 }

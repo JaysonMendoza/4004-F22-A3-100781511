@@ -16,6 +16,7 @@ export default function PlayingCard(props) {
     else {
         wSize = {width : '3vh'};
     }
+    let eleName = props.cardEnum==='CARDBACK' ? 'drawPile' : props.cardEnum;
 
     function handleClick(event) {
         console.log("Card Select:",props.cardEnum);
@@ -25,7 +26,7 @@ export default function PlayingCard(props) {
     }
 
     return (
-        <Card name={props.cardEnum} className={props.className} onClick={handleClick} style={{backgroundColor : 'transparent',}}>
+        <Card name={eleName} className={props.className} onClick={handleClick} style={{backgroundColor : 'transparent',}}>
             <Card.Img style={wSize} src={cardImage} alt={cardImageAlt}/>
         </Card>
     );

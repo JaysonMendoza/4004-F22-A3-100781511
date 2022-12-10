@@ -29,6 +29,10 @@ public class Player {
     private int score;
     private boolean isTurnSkipped;
 
+    public ArrayList<Card> getHand() {
+        return new ArrayList<>(hand);
+    }
+
     public int getRank() {
         return rank;
     }
@@ -90,6 +94,20 @@ public class Player {
 
     public String getName() {
         return name;
+    }
+
+    public void __fixHand(ArrayList<Card> cardsInHand) {
+        hand.clear();
+        cardsByRank.clear();
+        cardsOfSuit.clear();
+        for(Suit s : Suit.values()) {
+            cardsOfSuit.put(s,new ArrayList<>());
+        }
+        wildCards.clear();
+        for(Card c : cardsInHand) {
+            addCard(c);
+        }
+        notifyHandUpdated();
     }
 
     /**

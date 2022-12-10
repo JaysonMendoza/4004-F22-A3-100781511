@@ -110,8 +110,8 @@ public abstract class AbstractSeleniumTest {
 
     public WebElement waitAndClickElement(final By targetElement,final int userIndex) {
         WebDriver wd = this.userInstances.get(userIndex);
-//        WebElement element = waitElementDisplayed(targetElement,userIndex);
-        WebElement element = new WebDriverWait(wd,MAX_WAIT).until((ExpectedConditions.elementToBeClickable(wd.findElement(targetElement))));
+        WebElement element = waitElementDisplayed(targetElement,userIndex);
+        new WebDriverWait(wd,MAX_WAIT).until((ExpectedConditions.elementToBeClickable(wd.findElement(targetElement))));
         element.click();
         return element;
     }
