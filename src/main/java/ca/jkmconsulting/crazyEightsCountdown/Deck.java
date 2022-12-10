@@ -157,8 +157,15 @@ public class Deck {
         return c;
     }
 
-    public boolean discardCard(Card card) {
+    public boolean checkIfCardCanBePlayed(Card card) {
         if( !(activeSuit==null || card.isWildCard() || card.getSuit()==activeSuit || card.getRank()== activeCardRank) ) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean discardCard(Card card) {
+        if( !checkIfCardCanBePlayed(card) ) {
             return false;
         }
         boolean rc = cardsIssued.remove(card);

@@ -362,23 +362,28 @@ public class GameController implements DeckObserver {
             pickup = PICKUP_TWO_INCREMENT;
             cardsDrawnInTurn = cardsDrawnInTurn - PICKUP_TWO_INCREMENT;
         }
-
+        ArrayList<Card> drawnCards = new ArrayList<>();
         for(int i=0;i<pickup;++i) {
-            Card c = deck.drawCard();
-            sendIndividualMessage(null,currentPlayer,String.format("You draw a %s",c));
+            drawnCards.add(deck.drawCard());
+            sendIndividualMessage(null,currentPlayer,String.format("You draw a %s",drawnCards.get(drawnCards.size()-1)));
             ++cardsDrawnInTurn;
-            if(c == null) {
+            if(drawnCards.get(drawnCards.size()-1) == null) {
                 break;
             }
-            if(!player.addCard(c)) {
-                this.LOG.error("PlayerID '{}' tried to add a drawn card '{}' but it failed because they already have it. This should never happen.",player.getPlayerID(),c);
-                throw new CrazyEightsIllegalCardException(String.format("PlayerID %s drew the %s card that they already had. This should not be possible. Verify the logic.",player.getPlayerID(),c));
+            if(!player.addCard(drawnCards.get(drawnCards.size()-1))) {
+                this.LOG.error("PlayerID '{}' tried to add a drawn card '{}' but it failed because they already have it. This should never happen.",player.getPlayerID(),drawnCards.get(drawnCards.size()-1));
+                throw new CrazyEightsIllegalCardException(String.format("PlayerID %s drew the %s card that they already had. This should not be possible. Verify the logic.",player.getPlayerID(),drawnCards.get(drawnCards.size()-1)));
             }
         }
         sendGlobalMessage(player,String.format("%s draws %d cards!",player.getName(),pickup));
         checkIfPickupTwoEventCompleted(true);
         if(cardsDrawnInTurn >= 3) {
-            nextTurn();
+            if(deck.checkIfCardCanBePlayed(drawnCards.get(drawnCards.size()-1))) {
+                actionPlayerPlayCard(player,drawnCards.get(drawnCards.size()-1));
+            }
+            else {
+                nextTurn();
+            }
         }
     }
 

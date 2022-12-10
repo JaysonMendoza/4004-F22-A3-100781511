@@ -3,6 +3,7 @@ package selenium;
 
 import ca.jkmconsulting.crazyEightsCountdown.*;
 import ca.jkmconsulting.crazyEightsCountdown.Enums.Card;
+import ca.jkmconsulting.crazyEightsCountdown.Enums.CardRank;
 import ca.jkmconsulting.crazyEightsCountdown.Enums.GameState;
 import ca.jkmconsulting.crazyEightsCountdown.Enums.Suit;
 import io.github.bonigarcia.wdm.WebDriverManager;
@@ -326,6 +327,192 @@ public class AcceptanceTest extends AbstractSeleniumTest {
         waitAndClickElement(AlertPopUp.byBtnAlertClose,0);
 
         assertTrue(players.get(0).getHand().contains(Card.SPADES_5));
+    }
+
+    @Test
+    public void A58() throws InterruptedException {
+        setupGame(null);
+        HashSet<Card> cardsToExcludeFromDeck = new HashSet<>();
+        ArrayList<Card> drawOrder = new ArrayList<>();
+        final Card topCard = Card.CLUBS_7;
+        cardsToExcludeFromDeck.add(topCard);
+
+        ArrayList<Card> p1 = new ArrayList<>();
+        p1.add(Card.HEARTS_3);
+        players.get(0).__fixHand(p1);
+        cardsToExcludeFromDeck.addAll(p1);
+
+        cardsToExcludeFromDeck.addAll(players.get(1).getHand());
+        cardsToExcludeFromDeck.addAll(players.get(2).getHand());
+        cardsToExcludeFromDeck.addAll(players.get(3).getHand());
+
+        drawOrder.add(Card.CLUBS_6);
+
+        deck.buildDeck(drawOrder,cardsToExcludeFromDeck,topCard);
+
+        assertEquals(1,players.get(0).getHand().size());
+        waitAndClickElement(DeckArea.byBtnDrawCard,0);
+        assertTrue(players.get(0).getHand().contains(Card.CLUBS_6));
+
+        waitAndClickElement(PlayerHand.byCardEnum(Card.CLUBS_6),0);
+        waitAndClickElement(PlayerHand.byBtnPlayCard,0);
+
+        assertEquals(Card.CLUBS_6,deck.getTopDiscardCard());
+
+    }
+
+    @Test
+    public void A59() throws InterruptedException {
+        setupGame(null);
+        HashSet<Card> cardsToExcludeFromDeck = new HashSet<>();
+        ArrayList<Card> drawOrder = new ArrayList<>();
+        final Card topCard = Card.CLUBS_7;
+        cardsToExcludeFromDeck.add(topCard);
+
+        ArrayList<Card> p1 = new ArrayList<>();
+        p1.add(Card.HEARTS_3);
+        players.get(0).__fixHand(p1);
+        cardsToExcludeFromDeck.addAll(p1);
+
+        cardsToExcludeFromDeck.addAll(players.get(1).getHand());
+        cardsToExcludeFromDeck.addAll(players.get(2).getHand());
+        cardsToExcludeFromDeck.addAll(players.get(3).getHand());
+
+        drawOrder.add(Card.DIAMONDS_6);
+        drawOrder.add(Card.CLUBS_5);
+
+        deck.buildDeck(drawOrder,cardsToExcludeFromDeck,topCard);
+
+        assertEquals(1,players.get(0).getHand().size());
+        waitAndClickElement(DeckArea.byBtnDrawCard,0);
+        assertTrue(players.get(0).getHand().contains(Card.DIAMONDS_6));
+        assertEquals(2,players.get(0).getHand().size());
+        waitAndClickElement(DeckArea.byBtnDrawCard,0);
+        assertTrue(players.get(0).getHand().contains(Card.CLUBS_5));
+        assertEquals(3,players.get(0).getHand().size());
+
+        waitAndClickElement(PlayerHand.byCardEnum(Card.CLUBS_5),0);
+        waitAndClickElement(PlayerHand.byBtnPlayCard,0);
+
+        assertEquals(Card.CLUBS_5,deck.getTopDiscardCard());
+    }
+
+    @Test
+    public void A60() throws InterruptedException {
+        setupGame(null);
+        HashSet<Card> cardsToExcludeFromDeck = new HashSet<>();
+        ArrayList<Card> drawOrder = new ArrayList<>();
+        final Card topCard = Card.CLUBS_7;
+        cardsToExcludeFromDeck.add(topCard);
+
+        ArrayList<Card> p1 = new ArrayList<>();
+        p1.add(Card.HEARTS_3);
+        players.get(0).__fixHand(p1);
+        cardsToExcludeFromDeck.addAll(p1);
+
+        cardsToExcludeFromDeck.addAll(players.get(1).getHand());
+        cardsToExcludeFromDeck.addAll(players.get(2).getHand());
+        cardsToExcludeFromDeck.addAll(players.get(3).getHand());
+
+        drawOrder.add(Card.DIAMONDS_6);
+        drawOrder.add(Card.SPADES_5);
+        drawOrder.add(Card.HEARTS_7);
+
+        deck.buildDeck(drawOrder,cardsToExcludeFromDeck,topCard);
+
+        assertEquals(1,players.get(0).getHand().size());
+        waitAndClickElement(DeckArea.byBtnDrawCard,0);
+        assertTrue(players.get(0).getHand().contains(Card.DIAMONDS_6));
+        assertEquals(2,players.get(0).getHand().size());
+        waitAndClickElement(DeckArea.byBtnDrawCard,0);
+        assertTrue(players.get(0).getHand().contains(Card.SPADES_5));
+        assertEquals(3,players.get(0).getHand().size());
+        waitAndClickElement(DeckArea.byBtnDrawCard,0);
+        sleep(Duration.ofSeconds(2).toMillis());
+        //Since it was the third draw and was valid to be played, it should have been automatically played
+        assertEquals(Card.HEARTS_7,deck.getTopDiscardCard());
+    }
+
+    @Test
+    public void A61() throws InterruptedException {
+        setupGame(null);
+        HashSet<Card> cardsToExcludeFromDeck = new HashSet<>();
+        ArrayList<Card> drawOrder = new ArrayList<>();
+        final Card topCard = Card.CLUBS_7;
+        cardsToExcludeFromDeck.add(topCard);
+
+        ArrayList<Card> p1 = new ArrayList<>();
+        p1.add(Card.HEARTS_3);
+        players.get(0).__fixHand(p1);
+        cardsToExcludeFromDeck.addAll(p1);
+
+        cardsToExcludeFromDeck.addAll(players.get(1).getHand());
+        cardsToExcludeFromDeck.addAll(players.get(2).getHand());
+        cardsToExcludeFromDeck.addAll(players.get(3).getHand());
+
+        drawOrder.add(Card.DIAMONDS_6);
+        drawOrder.add(Card.SPADES_5);
+        drawOrder.add(Card.HEARTS_4);
+
+        deck.buildDeck(drawOrder,cardsToExcludeFromDeck,topCard);
+
+        assertEquals(1,players.get(0).getHand().size());
+        waitAndClickElement(DeckArea.byBtnDrawCard,0);
+        assertTrue(players.get(0).getHand().contains(Card.DIAMONDS_6));
+        assertEquals(2,players.get(0).getHand().size());
+        waitAndClickElement(DeckArea.byBtnDrawCard,0);
+        assertTrue(players.get(0).getHand().contains(Card.SPADES_5));
+        assertEquals(3,players.get(0).getHand().size());
+        waitAndClickElement(DeckArea.byBtnDrawCard,0);
+
+        assertEquals(topCard,deck.getTopDiscardCard());
+        //Turn auto ended, check current player is 2
+        WebElement eleCurrentPlayerName = waitElementDisplayed(PlayerHand.byH5CurrentTurnPlayer,0);
+        assertTrue(  eleCurrentPlayerName.getText().contains(players.get(1).getName()));
+        assertEquals(players.get(1),gc.getCurrentPlayer());
+    }
+
+    @Test
+    public void A62() throws InterruptedException {
+        setupGame(null);
+        HashSet<Card> cardsToExcludeFromDeck = new HashSet<>();
+        ArrayList<Card> drawOrder = new ArrayList<>();
+        final Card topCard = Card.CLUBS_7;
+        cardsToExcludeFromDeck.add(topCard);
+
+        ArrayList<Card> p1 = new ArrayList<>();
+        p1.add(Card.HEARTS_3);
+        players.get(0).__fixHand(p1);
+        cardsToExcludeFromDeck.addAll(p1);
+
+        cardsToExcludeFromDeck.addAll(players.get(1).getHand());
+        cardsToExcludeFromDeck.addAll(players.get(2).getHand());
+        cardsToExcludeFromDeck.addAll(players.get(3).getHand());
+
+        drawOrder.add(Card.DIAMONDS_6);
+        drawOrder.add(Card.HEARTS_8);
+
+        deck.buildDeck(drawOrder,cardsToExcludeFromDeck,topCard);
+
+        assertEquals(1,players.get(0).getHand().size());
+        waitAndClickElement(DeckArea.byBtnDrawCard,0);
+        assertTrue(players.get(0).getHand().contains(Card.DIAMONDS_6));
+        assertEquals(2,players.get(0).getHand().size());
+        waitAndClickElement(DeckArea.byBtnDrawCard,0);
+        assertTrue(players.get(0).getHand().contains(Card.HEARTS_8));
+
+        waitAndClickElement(PlayerHand.byCardEnum(Card.HEARTS_8),0);
+        waitAndClickElement(PlayerHand.byBtnPlayCard,0);
+
+        //Suit Select - Diamonds
+        waitElementDisplayed(SuitSelect.byCardSelectDiamonds,0);
+        waitAndClickElement(SuitSelect.byCardSelectDiamonds,0);
+        assertEquals(Card.HEARTS_8,deck.getTopDiscardCard());
+        assertEquals(Suit.DIAMONDS,deck.getActiveSuit());
+
+        WebElement eleCurrentPlayerName = waitElementDisplayed(PlayerHand.byH5CurrentTurnPlayer,0);
+        assertTrue(  eleCurrentPlayerName.getText().contains(players.get(1).getName()));
+        assertEquals(players.get(1),gc.getCurrentPlayer());
     }
 
     @Test
