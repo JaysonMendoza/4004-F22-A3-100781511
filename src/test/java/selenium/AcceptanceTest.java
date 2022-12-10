@@ -901,5 +901,67 @@ public class AcceptanceTest extends AbstractSeleniumTest {
         assertEquals(2,gc.getRound());
     }
 
+    @Test
+    public void A78() throws InterruptedException {
+        setupGame(null);
+        Card topCard = null;
+        HashSet<Card> cardsToExcludeFromDeck = new HashSet<>();
+
+        //P1 Setup
+        ArrayList<Card> p1 = new ArrayList<>();
+        p1.add(Card.SPADES_ACE);
+        p1.add(Card.CLUBS_3); //To play
+        players.get(0).__fixHand(p1);
+        cardsToExcludeFromDeck.addAll(p1);
+
+        //P2 Setup
+        ArrayList<Card> p2 = new ArrayList<>();
+        p2.add(Card.CLUBS_4); //To Play
+        players.get(1).__fixHand(p2);
+        cardsToExcludeFromDeck.addAll(p2);
+
+        //P3 Setup
+        ArrayList<Card> p3 = new ArrayList<>();
+        p3.add(Card.HEARTS_8);
+        p3.add(Card.HEARTS_JACK);
+        p3.add(Card.HEARTS_6);
+        p3.add(Card.HEARTS_KING);
+        p3.add(Card.SPADES_KING);
+        players.get(2).__fixHand(p3);
+        cardsToExcludeFromDeck.addAll(p3);
+
+        //P1 Setup
+        ArrayList<Card> p4 = new ArrayList<>();
+        p4.add(Card.CLUBS_8);
+        p4.add(Card.DIAMONDS_8);
+        p4.add(Card.DIAMONDS_2);
+        players.get(3).__fixHand(p4);
+        cardsToExcludeFromDeck.addAll(p4);
+
+        // Stack the deck with the cards not in players hands. Everything no specified in draw order is random
+        deck.buildDeck(null,cardsToExcludeFromDeck,null);
+
+        waitAndClickElement(PlayerHand.byCardEnum(Card.CLUBS_3),0);
+        waitAndClickElement(PlayerHand.byBtnPlayCard,0);
+
+        assertEquals(Card.CLUBS_3,deck.getTopDiscardCard());
+        WebElement eleCurrentPlayerName = waitElementDisplayed(PlayerHand.byH5CurrentTurnPlayer,0);
+        assertTrue(  eleCurrentPlayerName.getText().contains(players.get(1).getName()));
+        assertEquals(players.get(1),gc.getCurrentPlayer());
+
+        waitAndClickElement(PlayerHand.byCardEnum(Card.CLUBS_4),1);
+        waitAndClickElement(PlayerHand.byBtnPlayCard,1);
+
+        assertEquals("You Win The Game!",waitElementDisplayed(AlertPopUp.byTxtTitle,1).getText());
+        assertEquals("You Loose The Game!",waitElementDisplayed(AlertPopUp.byTxtTitle,0).getText());
+        assertEquals("You Loose The Game!",waitElementDisplayed(AlertPopUp.byTxtTitle,2).getText());
+        assertEquals("You Loose The Game!",waitElementDisplayed(AlertPopUp.byTxtTitle,3).getText());
+        assertEquals(GameState.ENDED,gc.getState());
+        assertEquals("1", waitElementDisplayed(ScoreBoard.bytxtPlayerScore(players.get(0)), 0).getText());
+        assertEquals("0", waitElementDisplayed(ScoreBoard.bytxtPlayerScore(players.get(1)), 1).getText());
+        assertEquals("86", waitElementDisplayed(ScoreBoard.bytxtPlayerScore(players.get(2)), 2).getText());
+        assertEquals("102", waitElementDisplayed(ScoreBoard.bytxtPlayerScore(players.get(3)), 3).getText());
+    }
+
 
 }

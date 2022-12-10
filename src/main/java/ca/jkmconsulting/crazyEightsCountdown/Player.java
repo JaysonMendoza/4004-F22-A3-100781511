@@ -168,7 +168,7 @@ public class Player {
         for(Card c : hand) {
             score+=switch(c.getRank()) {
                 case EIGHT -> 50;
-                case JACK,QUEEN,KING,ACE -> 10;
+                case JACK,QUEEN,KING -> 10;
                 default -> c.getRank().rank;
             };
         }

@@ -13,7 +13,7 @@ public enum CardRank {
     JACK(11),
     QUEEN(12),
     KING(13),
-    ACE(14)
+    ACE(1)
     ;
     public int rank;
     CardRank(int rank) {
