@@ -1,5 +1,5 @@
 import React from 'react';
-import { CardGroup } from 'react-bootstrap';
+import { Container, Row,CardGroup, ButtonGroup, Button } from 'react-bootstrap';
 import PlayingCard from './PlayingCard';
 import { usePlayerStore } from '../Services/Stores';
 import { actionSelectSuit } from '../Services/SocketHandler';
@@ -14,11 +14,26 @@ export default function SuitChooser(props) {
     }
 
     return (
-        <CardGroup>
-            <PlayingCard id="selectDiamonds" cardEnum="DIAMONDS_8" onSelect={onSelected} isSelected={false} />
-            <PlayingCard id="selectClubs" cardEnum="CLUBS_8" onSelect={onSelected} isSelected={false} />
-            <PlayingCard id="selectHearts" cardEnum="HEARTS_8" onSelect={onSelected} isSelected={false} />
-            <PlayingCard id="selectSpades" cardEnum="SPADES_8" onSelect={onSelected} isSelected={false} />
-        </CardGroup>
+        <Container>
+            <Row>
+                <CardGroup name='suitSelect'>
+                    <PlayingCard cardEnum="DIAMONDS_8" onSelect={onSelected} isSelected={false} />
+                    <PlayingCard cardEnum="CLUBS_8" onSelect={onSelected} isSelected={false} />
+                    <PlayingCard cardEnum="HEARTS_8" onSelect={onSelected} isSelected={false} />
+                    <PlayingCard cardEnum="SPADES_8" onSelect={onSelected} isSelected={false} />
+                </CardGroup>
+            </Row>
+            <Row>
+                <ButtonGroup>
+                    <Button name="selectDiamonds" variant='primary' size='sm' onClick={() => onSelected("DIAMONDS_8")}>DIAMONDS</Button>
+                    <Button name="selectClubs" variant='primary' size='sm' onClick={() => onSelected("CLUBS_8")}>CLUBS</Button>
+                    <Button name="selectHearts" variant='primary' size='sm' onClick={() => onSelected("HEARTS_8")}>HEARTS</Button>
+                    <Button name="selectSpades" variant='primary' size='sm' onClick={() => onSelected("SPADES_8")}>SPADES</Button>
+                </ButtonGroup>
+            </Row>
+
+        </Container>
+
+
     );
 }

@@ -307,7 +307,7 @@ public class GameController implements DeckObserver {
 
         if(!deck.discardCard(card)) {
             this.LOG.warn("Player '{}' attempted to play an invalid card '{}'.",player.getPlayerID(),card);
-            sendAlert(player,new AlertData(AlertTypes.BAD,"Play Card : Invalid Card",String.format("The card %s is of an invalid suit and/or is not a wild card. You must choose to play an 8 wildcard, a card of the %s suit, or a %s card.",card,deck.getActiveSuit(),deck.getActiveCardRank()),true));
+            sendAlert(player,new AlertData(AlertTypes.BAD,"Play Card : Invalid Card",String.format("The card %s is of an invalid suit or Rank and/or is not a wild card. You must choose to play an 8 wildcard, a card of the %s suit, or a %s card.",card,deck.getActiveSuit(),deck.getActiveCardRank()),true));
             return;
         }
 

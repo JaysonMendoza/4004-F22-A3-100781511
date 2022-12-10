@@ -51,12 +51,19 @@ public class Deck {
         return activeSuit;
     }
 
+    public Card getTopDiscardCard() {
+        if(discardPile.size()==0) {
+            return null;
+        }
+        return discardPile.peek();
+    }
+
     public void setActiveSuit(Suit newActiveSuit) {
         this.LOG.info("Active suit set to '{}'",newActiveSuit);
 
         activeSuit = newActiveSuit;
     }
-    public void buildDeck(ArrayList<Card> cardOrder,HashSet<Card> exludeFromDeck) {
+    public void buildDeck(ArrayList<Card> cardOrder,HashSet<Card> exludeFromDeck, Card topCard) {
         drawDeck.clear();
         discardPile.clear();
         cardsIssued.clear();
@@ -66,6 +73,12 @@ public class Deck {
         if(exludeFromDeck!=null) {
             allCards.removeAll(exludeFromDeck);
             cardsIssued.addAll(exludeFromDeck);
+        }
+        if(topCard!=null) {
+            allCards.remove(topCard);
+            discardPile.push(topCard);
+            activeSuit = topCard.getSuit();
+            activeCardRank = topCard.getRank();
         }
         Collections.shuffle(allCards);
 //        ArrayList<Card> order = cardOrder;
@@ -88,7 +101,7 @@ public class Deck {
     }
 
     public void buildDeck(ArrayList<Card> cardOrder) {
-        buildDeck(cardOrder,null);
+        buildDeck(cardOrder,null,null);
     }
 
     public int getNumCardsInDeck() {

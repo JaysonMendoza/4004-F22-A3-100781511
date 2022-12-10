@@ -1,10 +1,10 @@
-package selenium.ComponentWrappers;
+package selenium;
 
 
 import ca.jkmconsulting.crazyEightsCountdown.*;
-import ca.jkmconsulting.crazyEightsCountdown.Enums.AlertTypes;
 import ca.jkmconsulting.crazyEightsCountdown.Enums.Card;
 import ca.jkmconsulting.crazyEightsCountdown.Enums.GameState;
+import ca.jkmconsulting.crazyEightsCountdown.Enums.Suit;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import selenium.AbstractSeleniumTest;
+import selenium.ComponentWrappers.*;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -238,9 +238,99 @@ public class AcceptanceTest extends AbstractSeleniumTest {
     }
 
     @Test
+    public void A51() throws InterruptedException {
+        setupGame(null);
+        HashSet<Card> cardsToExcludeFromDeck = new HashSet<>();
+        ArrayList<Card> p1 = new ArrayList<>();
+        p1.add(Card.HEARTS_KING);
+        p1.add(Card.SPADES_7);
+        players.get(0).__fixHand(p1);
+        cardsToExcludeFromDeck.addAll(p1);
+        cardsToExcludeFromDeck.addAll(players.get(1).getHand());
+        cardsToExcludeFromDeck.addAll(players.get(2).getHand());
+        cardsToExcludeFromDeck.addAll(players.get(3).getHand());
+        deck.buildDeck(null,cardsToExcludeFromDeck,Card.CLUBS_KING);
+
+        waitAndClickElement(PlayerHand.byCardEnum(Card.HEARTS_KING),0);
+        waitAndClickElement(PlayerHand.byBtnPlayCard,0);
+        assertFalse(players.get(0).getHand().contains(Card.HEARTS_KING));
+        assertEquals(Card.HEARTS_KING,deck.getTopDiscardCard());
+    }
+
+    @Test
+    public void A52() throws InterruptedException {
+        setupGame(null);
+        HashSet<Card> cardsToExcludeFromDeck = new HashSet<>();
+        ArrayList<Card> p1 = new ArrayList<>();
+        p1.add(Card.HEARTS_KING);
+        p1.add(Card.CLUBS_7);
+        players.get(0).__fixHand(p1);
+        cardsToExcludeFromDeck.addAll(p1);
+        cardsToExcludeFromDeck.addAll(players.get(1).getHand());
+        cardsToExcludeFromDeck.addAll(players.get(2).getHand());
+        cardsToExcludeFromDeck.addAll(players.get(3).getHand());
+        deck.buildDeck(null,cardsToExcludeFromDeck,Card.CLUBS_KING);
+
+        waitAndClickElement(PlayerHand.byCardEnum(Card.CLUBS_7),0);
+        waitAndClickElement(PlayerHand.byBtnPlayCard,0);
+        assertFalse(players.get(0).getHand().contains(Card.CLUBS_7));
+        assertEquals(Card.CLUBS_7,deck.getTopDiscardCard());
+    }
+
+    @Test
+    public void A53() throws InterruptedException {
+        setupGame(null);
+        HashSet<Card> cardsToExcludeFromDeck = new HashSet<>();
+        ArrayList<Card> p1 = new ArrayList<>();
+        p1.add(Card.HEARTS_8);
+        p1.add(Card.CLUBS_7);
+        players.get(0).__fixHand(p1);
+        cardsToExcludeFromDeck.addAll(p1);
+        cardsToExcludeFromDeck.addAll(players.get(1).getHand());
+        cardsToExcludeFromDeck.addAll(players.get(2).getHand());
+        cardsToExcludeFromDeck.addAll(players.get(3).getHand());
+        deck.buildDeck(null,cardsToExcludeFromDeck,Card.CLUBS_KING);
+
+        waitAndClickElement(PlayerHand.byCardEnum(Card.HEARTS_8),0);
+        waitAndClickElement(PlayerHand.byBtnPlayCard,0);
+
+        //Handle Suit Select
+        waitElementDisplayed(SuitSelect.byCardSelectDiamonds,0);
+        waitAndClickElement(SuitSelect.byCardSelectDiamonds,0);
+
+        assertFalse(players.get(0).getHand().contains(Card.HEARTS_8));
+        assertEquals(Card.HEARTS_8,deck.getTopDiscardCard());
+        assertEquals(Suit.DIAMONDS,deck.getActiveSuit());
+    }
+
+    @Test
+    public void A54() throws InterruptedException {
+        setupGame(null);
+        HashSet<Card> cardsToExcludeFromDeck = new HashSet<>();
+        ArrayList<Card> p1 = new ArrayList<>();
+        p1.add(Card.SPADES_5);
+        p1.add(Card.CLUBS_7);
+        players.get(0).__fixHand(p1);
+        cardsToExcludeFromDeck.addAll(p1);
+        cardsToExcludeFromDeck.addAll(players.get(1).getHand());
+        cardsToExcludeFromDeck.addAll(players.get(2).getHand());
+        cardsToExcludeFromDeck.addAll(players.get(3).getHand());
+        deck.buildDeck(null,cardsToExcludeFromDeck,Card.CLUBS_KING);
+
+        waitAndClickElement(PlayerHand.byCardEnum(Card.SPADES_5),0);
+        waitAndClickElement(PlayerHand.byBtnPlayCard,0);
+
+        //Handle Error Message
+        WebElement we = waitElementDisplayed(AlertPopUp.byTxtTitle,0);
+        assertEquals("Play Card : Invalid Card",we.getText());
+        waitAndClickElement(AlertPopUp.byBtnAlertClose,0);
+
+        assertTrue(players.get(0).getHand().contains(Card.SPADES_5));
+    }
+
+    @Test
     public void A67() throws InterruptedException {
         setupGame(null);
-        ArrayList<Card> cardList = new ArrayList<>();
         //Sequence of Play
         //P1 -> 2C
         //P2 -> Must draw because only has 4H (No clubs or 2), Draws 6C 9D, then plays 6C
@@ -267,7 +357,7 @@ public class AcceptanceTest extends AbstractSeleniumTest {
         cardsToExcludeFromDeck.addAll(players.get(3).getHand());
 
         // Stack the deck with the cards not in players hands. Everything no specified in draw order is random
-        deck.buildDeck(drawOrder,cardsToExcludeFromDeck);
+        deck.buildDeck(drawOrder,cardsToExcludeFromDeck,null);
 
 
         waitAndClickElement(PlayerHand.byCardEnum(Card.CLUBS_2),0);
