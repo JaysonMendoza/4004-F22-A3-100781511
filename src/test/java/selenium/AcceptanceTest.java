@@ -516,6 +516,43 @@ public class AcceptanceTest extends AbstractSeleniumTest {
     }
 
     @Test
+    public void A63() throws InterruptedException {
+        setupGame(null);
+        HashSet<Card> cardsToExcludeFromDeck = new HashSet<>();
+        ArrayList<Card> drawOrder = new ArrayList<>();
+        final Card topCard = Card.CLUBS_7;
+        cardsToExcludeFromDeck.add(topCard);
+
+        ArrayList<Card> p1 = new ArrayList<>();
+        p1.add(Card.CLUBS_3);
+        p1.add(Card.SPADES_KING);
+        players.get(0).__fixHand(p1);
+        cardsToExcludeFromDeck.addAll(p1);
+
+        cardsToExcludeFromDeck.addAll(players.get(1).getHand());
+        cardsToExcludeFromDeck.addAll(players.get(2).getHand());
+        cardsToExcludeFromDeck.addAll(players.get(3).getHand());
+
+        drawOrder.add(Card.CLUBS_6);
+
+        deck.buildDeck(drawOrder,cardsToExcludeFromDeck,topCard);
+
+        assertEquals(2,players.get(0).getHand().size());
+        waitAndClickElement(DeckArea.byBtnDrawCard,0);
+        assertTrue(players.get(0).getHand().contains(Card.CLUBS_6));
+
+
+        waitAndClickElement(PlayerHand.byCardEnum(Card.CLUBS_6),0);
+        waitAndClickElement(PlayerHand.byBtnPlayCard,0);
+        assertFalse(players.get(0).getHand().contains(Card.CLUBS_6));
+        assertEquals(Card.CLUBS_6,deck.getTopDiscardCard());
+
+        WebElement eleCurrentPlayerName = waitElementDisplayed(PlayerHand.byH5CurrentTurnPlayer,0);
+        assertTrue(  eleCurrentPlayerName.getText().contains(players.get(1).getName()));
+        assertEquals(players.get(1),gc.getCurrentPlayer());
+    }
+
+    @Test
     public void A67() throws InterruptedException {
         setupGame(null);
         //Sequence of Play
@@ -562,5 +599,307 @@ public class AcceptanceTest extends AbstractSeleniumTest {
         waitAndClickElement(PlayerHand.byBtnPlayCard,1);
 
     }
+
+    @Test
+    public void A68() throws InterruptedException {
+        setupGame(null);
+        Card topCard = null;
+        ArrayList<Card> drawOrder = new ArrayList<>();
+        HashSet<Card> cardsToExcludeFromDeck = new HashSet<>();
+        drawOrder.add(Card.SPADES_6); //P2
+        drawOrder.add(Card.DIAMONDS_9); //P2
+        drawOrder.add(Card.HEARTS_9);
+        drawOrder.add(Card.CLUBS_6);
+
+        //P1 Setup
+        ArrayList<Card> p1 = new ArrayList<>();
+        p1.add(Card.CLUBS_2);
+        p1.add(Card.CLUBS_4);
+        players.get(0).__fixHand(p1);
+        cardsToExcludeFromDeck.addAll(p1);
+
+        //P2 Setup
+        ArrayList<Card> p2 = new ArrayList<>();
+        p2.add(Card.HEARTS_4);
+        players.get(1).__fixHand(p2);
+        cardsToExcludeFromDeck.addAll(p2);
+
+        //Other Players Keep their hands
+        cardsToExcludeFromDeck.addAll(players.get(2).getHand());
+        cardsToExcludeFromDeck.addAll(players.get(3).getHand());
+
+        // Stack the deck with the cards not in players hands. Everything no specified in draw order is random
+        deck.buildDeck(drawOrder,cardsToExcludeFromDeck,null);
+
+
+        waitAndClickElement(PlayerHand.byCardEnum(Card.CLUBS_2),0);
+        waitAndClickElement(PlayerHand.byBtnPlayCard,0);
+
+        //Click on deck to draw 2 cards instead of play
+        assertEquals(1,players.get(1).getHandSize());
+        waitElementDisplayed(DeckArea.byBtnDrawCard,1);
+        waitAndClickElement(DeckArea.byBtnDrawCard,1);
+        sleep(Duration.ofSeconds(2).toMillis());
+        assertEquals(3,players.get(1).getHandSize());
+
+        waitElementDisplayed(DeckArea.byBtnDrawCard,1);
+        waitAndClickElement(DeckArea.byBtnDrawCard,1);
+        assertEquals(4,players.get(1).getHandSize());
+
+        waitElementDisplayed(DeckArea.byBtnDrawCard,1);
+        waitAndClickElement(DeckArea.byBtnDrawCard,1);
+        assertEquals(5,players.get(1).getHandSize());
+
+        // Play 6C
+        waitAndClickElement(PlayerHand.byCardEnum(Card.CLUBS_6),1);
+        waitAndClickElement(PlayerHand.byBtnPlayCard,1);
+
+        assertEquals(Card.CLUBS_6,deck.getTopDiscardCard());
+        WebElement eleCurrentPlayerName = waitElementDisplayed(PlayerHand.byH5CurrentTurnPlayer,0);
+        assertTrue(  eleCurrentPlayerName.getText().contains(players.get(2).getName()));
+        assertEquals(players.get(2),gc.getCurrentPlayer());
+
+    }
+
+    @Test
+    public void A69() throws InterruptedException {
+        setupGame(null);
+        Card topCard = null;
+        ArrayList<Card> drawOrder = new ArrayList<>();
+        HashSet<Card> cardsToExcludeFromDeck = new HashSet<>();
+        drawOrder.add(Card.SPADES_6); //P2
+        drawOrder.add(Card.DIAMONDS_9); //P2
+        drawOrder.add(Card.HEARTS_9);
+        drawOrder.add(Card.SPADES_7);
+        drawOrder.add(Card.HEARTS_5);
+
+        //P1 Setup
+        ArrayList<Card> p1 = new ArrayList<>();
+        p1.add(Card.CLUBS_2);
+        p1.add(Card.CLUBS_4);
+        players.get(0).__fixHand(p1);
+        cardsToExcludeFromDeck.addAll(p1);
+
+        //P2 Setup
+        ArrayList<Card> p2 = new ArrayList<>();
+        p2.add(Card.HEARTS_4);
+        players.get(1).__fixHand(p2);
+        cardsToExcludeFromDeck.addAll(p2);
+
+        //Other Players Keep their hands
+        cardsToExcludeFromDeck.addAll(players.get(2).getHand());
+        cardsToExcludeFromDeck.addAll(players.get(3).getHand());
+
+        // Stack the deck with the cards not in players hands. Everything no specified in draw order is random
+        deck.buildDeck(drawOrder,cardsToExcludeFromDeck,null);
+
+
+        waitAndClickElement(PlayerHand.byCardEnum(Card.CLUBS_2),0);
+        waitAndClickElement(PlayerHand.byBtnPlayCard,0);
+
+        //Click on deck to draw 2 cards instead of play
+        assertEquals(1,players.get(1).getHandSize());
+        waitElementDisplayed(DeckArea.byBtnDrawCard,1);
+        waitAndClickElement(DeckArea.byBtnDrawCard,1);
+        sleep(Duration.ofSeconds(2).toMillis());
+        assertEquals(3,players.get(1).getHandSize());
+
+        waitElementDisplayed(DeckArea.byBtnDrawCard,1);
+        waitAndClickElement(DeckArea.byBtnDrawCard,1);
+        assertEquals(4,players.get(1).getHandSize());
+
+        waitElementDisplayed(DeckArea.byBtnDrawCard,1);
+        waitAndClickElement(DeckArea.byBtnDrawCard,1);
+        assertEquals(5,players.get(1).getHandSize());
+
+        waitElementDisplayed(DeckArea.byBtnDrawCard,1);
+        waitAndClickElement(DeckArea.byBtnDrawCard,1);
+        assertEquals(6,players.get(1).getHandSize());
+
+
+        assertEquals(Card.CLUBS_2,deck.getTopDiscardCard());
+        WebElement eleCurrentPlayerName = waitElementDisplayed(PlayerHand.byH5CurrentTurnPlayer,0);
+        assertTrue(  eleCurrentPlayerName.getText().contains(players.get(2).getName()));
+        assertEquals(players.get(2),gc.getCurrentPlayer());
+
+    }
+
+    @Test
+    public void A71() throws InterruptedException {
+        setupGame(null);
+        Card topCard = null;
+        ArrayList<Card> drawOrder = new ArrayList<>();
+        HashSet<Card> cardsToExcludeFromDeck = new HashSet<>();
+        drawOrder.add(Card.HEARTS_2); //P2
+        drawOrder.add(Card.DIAMONDS_9); //P2
+        drawOrder.add(Card.SPADES_5); //P3
+        drawOrder.add(Card.DIAMONDS_6); //P3
+        drawOrder.add(Card.HEARTS_6); //P3
+        drawOrder.add(Card.CLUBS_7); //P3
+
+
+        //P1 Setup
+        ArrayList<Card> p1 = new ArrayList<>();
+        p1.add(Card.CLUBS_2);
+        p1.add(Card.CLUBS_4);
+        players.get(0).__fixHand(p1);
+        cardsToExcludeFromDeck.addAll(p1);
+
+        //P2 Setup
+        ArrayList<Card> p2 = new ArrayList<>();
+        p2.add(Card.HEARTS_4);
+        players.get(1).__fixHand(p2);
+        cardsToExcludeFromDeck.addAll(p2);
+
+        //P3 Setup
+        ArrayList<Card> p3 = new ArrayList<>();
+        p3.add(Card.DIAMONDS_7);
+        players.get(2).__fixHand(p3);
+        cardsToExcludeFromDeck.addAll(p3);
+
+        //Other Players Keep their hands
+        cardsToExcludeFromDeck.addAll(players.get(3).getHand());
+
+        // Stack the deck with the cards not in players hands. Everything no specified in draw order is random
+        deck.buildDeck(drawOrder,cardsToExcludeFromDeck,null);
+
+
+        waitAndClickElement(PlayerHand.byCardEnum(Card.CLUBS_2),0);
+        waitAndClickElement(PlayerHand.byBtnPlayCard,0);
+
+        //Click on deck to draw 2 cards instead of play
+        assertEquals(1,players.get(1).getHandSize());
+        waitElementDisplayed(DeckArea.byBtnDrawCard,1);
+        waitAndClickElement(DeckArea.byBtnDrawCard,1);
+        sleep(Duration.ofSeconds(2).toMillis());
+        assertEquals(3,players.get(1).getHandSize());
+
+        //Plays 2H to trigger pick 4
+        waitAndClickElement(PlayerHand.byCardEnum(Card.HEARTS_2),1);
+        waitAndClickElement(PlayerHand.byBtnPlayCard,1);
+        assertEquals(Card.HEARTS_2,deck.getTopDiscardCard());
+
+        //Player 3 turn
+        WebElement eleCurrentPlayerName = waitElementDisplayed(PlayerHand.byH5CurrentTurnPlayer,0);
+        assertTrue(  eleCurrentPlayerName.getText().contains(players.get(2).getName()));
+        assertEquals(players.get(2),gc.getCurrentPlayer());
+
+        assertEquals(1,players.get(2).getHandSize());
+        waitElementDisplayed(DeckArea.byBtnDrawCard,2);
+        waitAndClickElement(DeckArea.byBtnDrawCard,2);
+//        assertEquals(5,players.get(2).getHandSize());
+
+        //Plays 6H
+        waitAndClickElement(PlayerHand.byCardEnum(Card.HEARTS_6),2);
+        waitAndClickElement(PlayerHand.byBtnPlayCard,2);
+        assertEquals(Card.HEARTS_6,deck.getTopDiscardCard());
+
+        eleCurrentPlayerName = waitElementDisplayed(PlayerHand.byH5CurrentTurnPlayer,0);
+        assertTrue(  eleCurrentPlayerName.getText().contains(players.get(3).getName()));
+        assertEquals(players.get(3),gc.getCurrentPlayer());
+    }
+
+    @Test
+    public void A72() throws InterruptedException {
+        setupGame(null);
+        Card topCard = null;
+        HashSet<Card> cardsToExcludeFromDeck = new HashSet<>();
+
+
+        //P1 Setup
+        ArrayList<Card> p1 = new ArrayList<>();
+        p1.add(Card.CLUBS_2);
+        p1.add(Card.CLUBS_3);
+        players.get(0).__fixHand(p1);
+        cardsToExcludeFromDeck.addAll(p1);
+
+        //P2 Setup
+        ArrayList<Card> p2 = new ArrayList<>();
+        p2.add(Card.CLUBS_4);
+        p2.add(Card.CLUBS_6);
+        p2.add(Card.DIAMONDS_9);
+        players.get(1).__fixHand(p2);
+        cardsToExcludeFromDeck.addAll(p2);
+
+        //Other Players Keep their hands
+        cardsToExcludeFromDeck.addAll(players.get(2).getHand());
+        cardsToExcludeFromDeck.addAll(players.get(3).getHand());
+
+        // Stack the deck with the cards not in players hands. Everything no specified in draw order is random
+        deck.buildDeck(null,cardsToExcludeFromDeck,null);
+
+
+
+        waitAndClickElement(PlayerHand.byCardEnum(Card.CLUBS_2),0);
+        waitAndClickElement(PlayerHand.byBtnPlayCard,0);
+
+        assertEquals(Card.CLUBS_2,deck.getTopDiscardCard());
+        WebElement eleCurrentPlayerName = waitElementDisplayed(PlayerHand.byH5CurrentTurnPlayer,0);
+        assertTrue(  eleCurrentPlayerName.getText().contains(players.get(1).getName()));
+        assertEquals(players.get(1),gc.getCurrentPlayer());
+
+        waitAndClickElement(PlayerHand.byCardEnum(Card.CLUBS_4),1);
+        waitAndClickElement(PlayerHand.byBtnPlayCard,1);
+
+        waitAndClickElement(PlayerHand.byCardEnum(Card.CLUBS_6),1);
+        waitAndClickElement(PlayerHand.byBtnPlayCard,1);
+
+        assertEquals(Card.CLUBS_6,deck.getTopDiscardCard());
+        eleCurrentPlayerName = waitElementDisplayed(PlayerHand.byH5CurrentTurnPlayer,0);
+        assertTrue(  eleCurrentPlayerName.getText().contains(players.get(2).getName()));
+        assertEquals(players.get(2),gc.getCurrentPlayer());
+    }
+
+    @Test
+    public void A73() throws InterruptedException {
+        setupGame(null);
+        Card topCard = null;
+        HashSet<Card> cardsToExcludeFromDeck = new HashSet<>();
+
+
+        //P1 Setup
+        ArrayList<Card> p1 = new ArrayList<>();
+        p1.add(Card.CLUBS_2);
+        p1.add(Card.CLUBS_3);
+        players.get(0).__fixHand(p1);
+        cardsToExcludeFromDeck.addAll(p1);
+
+        //P2 Setup
+        ArrayList<Card> p2 = new ArrayList<>();
+        p2.add(Card.CLUBS_4);
+        p2.add(Card.CLUBS_6);
+        players.get(1).__fixHand(p2);
+        cardsToExcludeFromDeck.addAll(p2);
+
+        //Other Players Keep their hands
+        cardsToExcludeFromDeck.addAll(players.get(2).getHand());
+        cardsToExcludeFromDeck.addAll(players.get(3).getHand());
+
+        // Stack the deck with the cards not in players hands. Everything no specified in draw order is random
+        deck.buildDeck(null,cardsToExcludeFromDeck,null);
+
+        assertEquals(1,gc.getRound());
+        waitAndClickElement(PlayerHand.byCardEnum(Card.CLUBS_2),0);
+        waitAndClickElement(PlayerHand.byBtnPlayCard,0);
+
+        assertEquals(Card.CLUBS_2,deck.getTopDiscardCard());
+        WebElement eleCurrentPlayerName = waitElementDisplayed(PlayerHand.byH5CurrentTurnPlayer,0);
+        assertTrue(  eleCurrentPlayerName.getText().contains(players.get(1).getName()));
+        assertEquals(players.get(1),gc.getCurrentPlayer());
+
+        waitAndClickElement(PlayerHand.byCardEnum(Card.CLUBS_4),1);
+        waitAndClickElement(PlayerHand.byBtnPlayCard,1);
+
+        waitAndClickElement(PlayerHand.byCardEnum(Card.CLUBS_6),1);
+        waitAndClickElement(PlayerHand.byBtnPlayCard,1);
+
+
+        eleCurrentPlayerName = waitElementDisplayed(PlayerHand.byH5CurrentTurnPlayer,0);
+        assertTrue(  eleCurrentPlayerName.getText().contains(players.get(1).getName()));
+        assertEquals(players.get(1),gc.getCurrentPlayer());
+
+        assertEquals(2,gc.getRound());
+    }
+
 
 }

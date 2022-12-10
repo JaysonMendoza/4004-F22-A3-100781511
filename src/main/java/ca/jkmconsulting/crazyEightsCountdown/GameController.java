@@ -1,9 +1,6 @@
 package ca.jkmconsulting.crazyEightsCountdown;
 
-import ca.jkmconsulting.crazyEightsCountdown.Enums.AlertTypes;
-import ca.jkmconsulting.crazyEightsCountdown.Enums.Card;
-import ca.jkmconsulting.crazyEightsCountdown.Enums.GameState;
-import ca.jkmconsulting.crazyEightsCountdown.Enums.Suit;
+import ca.jkmconsulting.crazyEightsCountdown.Enums.*;
 import ca.jkmconsulting.crazyEightsCountdown.Exceptions.*;
 import ca.jkmconsulting.crazyEightsCountdown.PayloadDataTypes.*;
 import org.slf4j.Logger;
@@ -33,6 +30,7 @@ public class GameController implements DeckObserver {
     private int cardsDrawnInTurn = 0;
     private ArrayList<Card> testModeCardOrder;
     private Set<Card> pickupTwoPlayedCards;
+    private int pickupTwoRequired;
     private Player currentPlayer;
     private final Deck deck = new Deck();
 
@@ -49,12 +47,13 @@ public class GameController implements DeckObserver {
         pickupTwoPlayedCards = null;
         isTestMode = false;
         testModeCardOrder=null;
+        pickupTwoRequired=PICKUP_TWO_INCREMENT;
     }
 
     public void setupGame(ArrayList<Card> cardOrder) {
         deck.subscribeDeckpdates(this);
         deck.buildDeck(cardOrder);
-        round=0;
+        round=1;
         pickupTwoPlayedCards=null;
         isWaitingOnSuitSelection=false;
         initTurnOrder();
@@ -327,7 +326,21 @@ public class GameController implements DeckObserver {
             case DIAMONDS_8,SPADES_8,HEARTS_8,CLUBS_8 -> handleWildCardPlayed();
             case CLUBS_ACE,SPADES_ACE,DIAMONDS_ACE,HEARTS_ACE -> handleAcePlayed();
             case HEARTS_QUEEN,SPADES_QUEEN,CLUBS_QUEEN,DIAMONDS_QUEEN -> handleQueenPlayed();
-            case DIAMONDS_2,SPADES_2,HEARTS_2,CLUBS_2 -> isNextPlayerPickupTwo=true;
+            case DIAMONDS_2,SPADES_2,HEARTS_2,CLUBS_2 -> {
+                boolean twoPlayed = false;
+
+                if(pickupTwoPlayedCards!= null) {
+                    for(Card c : pickupTwoPlayedCards) {
+                        if(c.getRank()== CardRank.TWO) {
+                            twoPlayed = true;
+                            break;
+                        }
+                    }
+                }
+
+                pickupTwoRequired = twoPlayed ? pickupTwoRequired+PICKUP_TWO_INCREMENT : PICKUP_TWO_INCREMENT;
+                isNextPlayerPickupTwo = true;
+            }
         }
 
         sendGlobalMessage(player,String.format("%s plays a %s.",player.getName(),card));
@@ -359,8 +372,8 @@ public class GameController implements DeckObserver {
         }
         else if(state==GameState.PICKUP_TWO_ACTIVE)
         {
-            pickup = PICKUP_TWO_INCREMENT;
-            cardsDrawnInTurn = cardsDrawnInTurn - PICKUP_TWO_INCREMENT;
+            pickup = pickupTwoRequired;
+            cardsDrawnInTurn = cardsDrawnInTurn - pickupTwoRequired;
         }
         ArrayList<Card> drawnCards = new ArrayList<>();
         for(int i=0;i<pickup;++i) {
@@ -493,11 +506,11 @@ public class GameController implements DeckObserver {
 
     private void startPickupTwoEvent() {
         state = GameState.PICKUP_TWO_ACTIVE;
-        pickupTwoPlayedCards=new HashSet<>(PICKUP_TWO_INCREMENT); //This starts the event
+        pickupTwoPlayedCards=new HashSet<>(pickupTwoRequired); //This starts the event
         isNextPlayerPickupTwo =false;
         deck.captureUndoPoint();
         message.convertAndSendToUser(currentPlayer.getSessionID(),"/queue/alert",new AlertData(AlertTypes.BAD,"Your Turn : Pickup 2",String.format("You must either play 2 cards immediately, or draw 2 cards. You may play any EIGHT, or a card of the suit %s",deck.getActiveSuit()),true));
-        sendGlobalMessage(null,String.format("Player %s begins their turn and must pickup 2 cards!",currentPlayer.getName()));
+        sendGlobalMessage(null,String.format("Player %s begins their turn and must pickup %d cards!",currentPlayer.getName(),pickupTwoRequired));
         message.convertAndSendToUser(currentPlayer.getPlayerID(),"/queue/pickUpTwoStart","");
     }
 
@@ -505,9 +518,10 @@ public class GameController implements DeckObserver {
         if(state!=GameState.PICKUP_TWO_ACTIVE) {
             return;
         }
-        else if(!playerDrewCards && pickupTwoPlayedCards!=null && pickupTwoPlayedCards.size() < PICKUP_TWO_INCREMENT) {
+        else if(!playerDrewCards && pickupTwoPlayedCards!=null && pickupTwoPlayedCards.size() < pickupTwoRequired) {
             return;
         }
+
         state = GameState.RUNNING;
         sendGlobalMessage(null,"Pickup two event has ended.");
         message.convertAndSendToUser(currentPlayer.getPlayerID(),"/queue/pickUpTwoEnd","");
